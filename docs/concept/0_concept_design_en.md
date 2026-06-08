@@ -198,5 +198,4 @@ The Noosystem, ASA, and AOF‑S form a comprehensive framework for AI agents. To
 This architectural triangle is ready to be adopted, extended, and governed by the community.
 
 ---
-**Authors:** Jorge Y. Hernández García (ETKinnova), DeepSeek (DeepThink) as systemic design assistant.  
-**Part of the standard:** AOF‑S v1.0
+**Authors:** Jorge Y. Hernández García (ETKinnova), DeepSeek (DeepThink) as systemic design assistant.

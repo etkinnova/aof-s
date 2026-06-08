@@ -129,6 +129,7 @@ AOF‑S se integra con los estándares abiertos del ecosistema de agentes:
 | [`docs/how.md`](docs/how.md) | Guía práctica de adopción |
 | [`spec/aof-s.yaml`](spec/aof-s.yaml) | Especificación formal del estándar |
 | [`spec/asa.yaml`](spec/asa.yaml) | Modelo de agencia ASA |
+| [`docs/concept/1_aofs-conceptual_es.md`](docs/concept/1_aofs-conceptual_es.md) | Diseño conceptual AOF‑S|
 
 ---
 
@@ -144,7 +145,7 @@ AOF‑S es un estándar abierto en evolución. Damos la bienvenida a:
 
 ## Autoría
 
-**Jorge Y. Hernández García** — ETKinnova  
+**Jorge Y. Hernández García** — ETKinnova, Cuba   
 📧 etkinnova@gmail.com
 
 Co‑diseñado con la asistencia de **DeepSeek** (modo DeepThink) como entorno de razonamiento extendido y co‑creación iterativa.
