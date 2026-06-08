@@ -129,7 +129,7 @@ AOF‑S se integra con los estándares abiertos del ecosistema de agentes:
 | [`docs/how.md`](docs/how.md) | Guía práctica de adopción |
 | [`spec/aof-s.yaml`](spec/aof-s.yaml) | Especificación formal del estándar |
 | [`spec/asa.yaml`](spec/asa.yaml) | Modelo de agencia ASA |
-| [`docs/concept/aofs-conceptual_es.md`](docs/concept/1_aofs-conceptual_es.md) | Diseño conceptual AOF‑S|
+| [`docs/concept/aofs-conceptual_es.md`](docs/concept/aofs-conceptual_es.md) | Diseño conceptual AOF‑S|
 
 ---
 
