@@ -1,7 +1,3 @@
-Aquí está la versión en inglés del Documento Conceptual Unificado que integra los tres pilares: Noosistema, ASA y AOF‑S.
-
----
-
 # Noosystem, ASA, and AOF‑S: Unified Conceptual Document
 
 **Purpose:** This document presents an integrated view of the three pillars of the Noosystem: the digital cognitive ecosystem (Noosystem), the agent architecture (ASA), and the file standard (AOF‑S). It provides a complete vision of how these three components complement each other to form a comprehensive framework for systemic, adaptive, and collaborative AI agents.
