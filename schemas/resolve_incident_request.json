@@ -1,0 +1,42 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://aof-s.io/schemas/resolve_incident_request.json",
+  "title": "Resolve Incident Request",
+  "description": "Solicitud para que el orquestador coordine la resolución de un incidente en el ecosistema.",
+  "type": "object",
+  "properties": {
+    "incident_id": {
+      "type": "string",
+      "description": "Identificador único del incidente (ej: 'INC-2026-06-07-001')."
+    },
+    "title": {
+      "type": "string",
+      "description": "Título breve del incidente (ej: 'Pico de latencia en checkout')."
+    },
+    "severity": {
+      "type": "string",
+      "enum": ["critical", "high", "medium", "low"],
+      "description": "Severidad del incidente."
+    },
+    "environment": {
+      "type": "string",
+      "enum": ["staging", "production"],
+      "description": "Entorno afectado por el incidente."
+    },
+    "affected_components": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Lista de componentes afectados (ej: 'checkout-api', 'db-primary')."
+    },
+    "symptoms": {
+      "type": "string",
+      "description": "Descripción de los síntomas observados (ej: 'latencia p95 > 2s, errores 500 en /checkout')."
+    },
+    "trigger": {
+      "type": "string",
+      "description": "Posible causa desencadenante (opcional)."
+    }
+  },
+  "required": ["incident_id", "title", "severity", "environment", "affected_components", "symptoms"],
+  "additionalProperties": false
+}

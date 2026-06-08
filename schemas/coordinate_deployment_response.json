@@ -1,0 +1,43 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://aof-s.io/schemas/coordinate_deployment_response.json",
+  "title": "Coordinate Deployment Response",
+  "description": "Respuesta del orquestador tras coordinar un despliegue.",
+  "type": "object",
+  "properties": {
+    "deployment_id": {
+      "type": "string",
+      "description": "Identificador único del despliegue ejecutado."
+    },
+    "status": {
+      "type": "string",
+      "enum": ["initiated", "in_progress", "completed", "failed", "rolled_back"],
+      "description": "Estado final del despliegue."
+    },
+    "message": {
+      "type": "string",
+      "description": "Resumen legible del resultado del despliegue."
+    },
+    "metrics": {
+      "type": "object",
+      "description": "Métricas clave post‑despliegue.",
+      "properties": {
+        "latency_p95_ms": {
+          "type": "number",
+          "description": "Latencia p95 del componente tras el despliegue."
+        },
+        "error_rate": {
+          "type": "number",
+          "description": "Tasa de errores del componente tras el despliegue."
+        }
+      }
+    },
+    "hypothesis_result": {
+      "type": "string",
+      "enum": ["validated", "falsified", "pending_reflection"],
+      "description": "Resultado de la validación de la hipótesis asociada."
+    }
+  },
+  "required": ["deployment_id", "status", "hypothesis_result"],
+  "additionalProperties": false
+}

@@ -1,0 +1,41 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://aof-s.io/schemas/coordinate_deployment_request.json",
+  "title": "Coordinate Deployment Request",
+  "description": "Solicitud para que el orquestador coordine un despliegue en el ecosistema.",
+  "type": "object",
+  "properties": {
+    "component": {
+      "type": "string",
+      "description": "Nombre del componente a desplegar (ej: 'checkout-api', 'db-migration')."
+    },
+    "version": {
+      "type": "string",
+      "description": "Versión de la imagen o chart a desplegar (ej: '2.3.1')."
+    },
+    "environment": {
+      "type": "string",
+      "enum": ["staging", "production"],
+      "description": "Entorno de destino del despliegue."
+    },
+    "strategy": {
+      "type": "string",
+      "enum": ["rolling_update", "blue_green", "canary"],
+      "default": "rolling_update",
+      "description": "Estrategia de despliegue a utilizar."
+    },
+    "hypothesis_id": {
+      "type": "string",
+      "description": "Identificador de la hipótesis que respalda este despliegue."
+    },
+    "validate_duration_minutes": {
+      "type": "integer",
+      "minimum": 5,
+      "maximum": 60,
+      "default": 15,
+      "description": "Duración en minutos de la validación post‑despliegue."
+    }
+  },
+  "required": ["component", "version", "environment", "hypothesis_id"],
+  "additionalProperties": false
+}

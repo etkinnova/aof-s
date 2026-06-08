@@ -1,0 +1,200 @@
+# Noosfile.yaml — Manifiesto del Noosistema Sectorial: Hospital Inteligente
+# Versión del API: noos.cncf.io/v1alpha2
+# Sector: hospital
+# Este manifiesto describe el estado deseado del sub-ecosistema de agentes
+# para un hospital que integra monitorización clínica, eficiencia energética
+# y ciberseguridad en un ciclo cerrado de mejora continua.
+
+apiVersion: "noos.cncf.io/v1alpha2"
+kind: "Noosystem"
+metadata:
+  name: "hospital-pinar-edificio-a"
+  namespace: "noos://hospital-pinar"
+  labels:
+    sector: "hospital"
+    environment: "production"
+spec:
+  mission: >
+    Garantizar la continuidad asistencial, optimizar el consumo energético
+    por debajo de 300 kWh/cama/año, y mantener la seguridad de los datos
+    clínicos según HIPAA y el Esquema Nacional de Seguridad, mediante
+    agentes de IA colaborativos con gobernanza algorítmica.
+  noos_level: 2
+  sector: "hospital"
+
+  # ── Agentes del ecosistema hospitalario ──
+  agents:
+    # Orquestador principal (N3)
+    - name: "hospital-orchestrator"
+      level: 3
+      template: "aof-s-orchestrated-v1"
+      scaling:
+        replicas: 1
+      resources:
+        cpu: "2000m"
+        memory: "2Gi"
+      sla:
+        availability: "99.99%"
+
+    # Agente clínico: monitorización de signos vitales y alertas tempranas
+    - name: "clinical-agent"
+      level: 2
+      template: "aof-s-systemic-v1"
+      scaling:
+        replicas: 1
+      resources:
+        cpu: "1000m"
+        memory: "1Gi"
+      sla:
+        availability: "99.9%"
+
+    # Agente energético: optimización de climatización, iluminación y baterías
+    - name: "energy-agent"
+      level: 2
+      template: "aof-s-systemic-v1"
+      scaling:
+        replicas: 1
+      resources:
+        cpu: "1000m"
+        memory: "1Gi"
+      sla:
+        availability: "99.5%"
+
+    # Agente de seguridad: detección de intrusiones, auditoría HIPAA, escaneo de vulnerabilidades
+    - name: "security-agent"
+      level: 2
+      template: "aof-s-systemic-v1"
+      scaling:
+        replicas: 1
+      resources:
+        cpu: "500m"
+        memory: "512Mi"
+      sla:
+        availability: "99.9%"
+
+    # Agente de logística hospitalaria: camas, suministros, farmacia
+    - name: "logistics-agent"
+      level: 2
+      template: "aof-s-systemic-v1"
+      scaling:
+        replicas: 1
+      resources:
+        cpu: "500m"
+        memory: "512Mi"
+
+    # Agentes reactivos (N1) para tareas de alta frecuencia
+    - name: "vital-signs-monitor"
+      level: 1
+      template: "aof-s-reactive-v1"
+      scaling:
+        min_replicas: 2
+        max_replicas: 10
+        metric: "vital_signs_ingestion_rate"
+      resources:
+        cpu: "250m"
+        memory: "256Mi"
+
+    - name: "hvac-local-controller"
+      level: 1
+      template: "aof-s-reactive-v1"
+      scaling:
+        min_replicas: 1
+        max_replicas: 5
+        metric: "hvac_adjustments_per_minute"
+      resources:
+        cpu: "250m"
+        memory: "256Mi"
+
+  # ── Seguridad Zero Trust (Tejido T2) ──
+  security:
+    agent_identity: "SPIFFE"
+    mTLS: true
+    policies:
+      agent_policies: |
+        package noos.authz
+        default allow = false
+
+        # El orquestador tiene acceso total
+        allow {
+            input.agent.level == 3
+        }
+
+        # Agentes N2 pueden leer y ejecutar dentro de su dominio
+        allow {
+            input.agent.level == 2
+            input.action in ["read", "execute"]
+        }
+
+        # El agente clínico puede acceder a datos de signos vitales
+        allow {
+            input.agent.name == "clinical-agent"
+            input.action == "read"
+            input.resource.type == "vital_signs"
+        }
+
+        # El agente de seguridad puede auditar todos los logs
+        allow {
+            input.agent.name == "security-agent"
+            input.action == "audit"
+        }
+
+        # Agentes N1 solo ejecutan su tarea específica
+        allow {
+            input.agent.level == 1
+            input.action == "execute"
+            input.agent.name == input.target.name
+        }
+    sandbox:
+      runtime: "gvisor"
+      allow_network_egress: false
+      readonly_rootfs: true
+    compliance:
+      - "HIPAA"
+      - "Esquema Nacional de Seguridad (ENS)"
+      - "OWASP Top 10 for Agentic Applications (2026)"
+
+  # ── Servicios compartidos ──
+  shared_services:
+    vector_db:
+      type: "lancedb"
+      size: "20Gi"
+    message_broker:
+      type: "redis"
+    knowledge_graph:
+      type: "neo4j-community"
+      size: "10Gi"
+    time_series_db:
+      type: "prometheus"
+      retention: "90d"
+
+  # ── Políticas globales ──
+  global_policies:
+    trust_threshold: 0.85
+    circuit_breaker:
+      max_failures: 2
+      window: "3m"
+      cooldown: "120s"
+    restart_policy: "Always"
+    auto_create_agents: false
+
+  # ── Evaluación del ecosistema ──
+  evaluation:
+    benchmark_suites:
+      - name: "MCP-AgentBench"
+        endpoint: "https://benchmarks.example.com/mcp-agentbench/v1"
+        frequency: "weekly"
+    metrics:
+      - ecosystem_uptime
+      - avg_hypothesis_validation_rate
+      - mean_time_to_resolution
+      - total_tokens_consumed
+      - energy_consumption_kwh_per_bed
+      - clinical_alert_false_positive_rate
+
+  # ── Entorno de ejecución ──
+  runtime:
+    sandbox: "gke-agent-sandbox"
+    observability:
+      tracing: "opentelemetry"
+      metrics: "prometheus"
+      logs: "loki"

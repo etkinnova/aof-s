@@ -1,0 +1,65 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://aof-s.io/schemas/health_check_response.json",
+  "title": "Health Check Response",
+  "description": "Respuesta de un agente del Noosistema a una solicitud de verificación de estado.",
+  "type": "object",
+  "properties": {
+    "agent_id": {
+      "type": "string",
+      "description": "Identificador único del agente que responde."
+    },
+    "agent_name": {
+      "type": "string",
+      "description": "Nombre simbólico del agente."
+    },
+    "status": {
+      "type": "string",
+      "enum": ["healthy", "degraded", "failed", "provisioning", "terminating"],
+      "description": "Estado actual del agente."
+    },
+    "level": {
+      "type": "integer",
+      "enum": [1, 2, 3],
+      "description": "Nivel de agencia del agente (1=Reactivo, 2=Sistémico, 3=Orquestado)."
+    },
+    "uptime_seconds": {
+      "type": "number",
+      "description": "Tiempo transcurrido desde el último arranque del agente, en segundos."
+    },
+    "cycle_phase": {
+      "type": "string",
+      "enum": ["startup", "reason", "hypothesize", "verify", "execute", "evaluate", "reflect", "idle"],
+      "description": "Fase actual del ciclo ASA en la que se encuentra el agente."
+    },
+    "last_intervention": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Marca de tiempo de la última intervención ejecutada (ISO 8601)."
+    },
+    "trust_score": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1,
+      "description": "Puntuación de confianza actual del agente."
+    },
+    "metrics": {
+      "type": "object",
+      "description": "Métricas básicas del agente, incluidas solo si se solicitaron explícitamente.",
+      "properties": {
+        "cpu_usage_percent": { "type": "number" },
+        "memory_usage_mb": { "type": "number" },
+        "active_sessions": { "type": "integer" },
+        "hypotheses_active": { "type": "integer" },
+        "hypotheses_validated_today": { "type": "integer" },
+        "avg_response_time_ms": { "type": "number" }
+      }
+    },
+    "message": {
+      "type": "string",
+      "description": "Mensaje legible opcional (ej: 'Operando normalmente', 'Sobrecarga detectada')."
+    }
+  },
+  "required": ["agent_id", "agent_name", "status", "level", "uptime_seconds", "cycle_phase"],
+  "additionalProperties": false
+}

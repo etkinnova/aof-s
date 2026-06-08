@@ -1,0 +1,25 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://aof-s.io/schemas/health_check_request.json",
+  "title": "Health Check Request",
+  "description": "Solicitud de verificación de estado a un agente del Noosistema.",
+  "type": "object",
+  "properties": {
+    "agent_id": {
+      "type": "string",
+      "description": "Identificador del agente solicitante (opcional). Si no se especifica, se asume que la solicitud proviene del orquestador."
+    },
+    "check_type": {
+      "type": "string",
+      "enum": ["liveness", "readiness", "full"],
+      "default": "liveness",
+      "description": "Tipo de verificación. 'liveness': el agente responde. 'readiness': el agente puede aceptar tareas. 'full': verificación completa con métricas."
+    },
+    "include_metrics": {
+      "type": "boolean",
+      "default": false,
+      "description": "Si es true, la respuesta debe incluir métricas básicas del agente."
+    }
+  },
+  "additionalProperties": false
+}

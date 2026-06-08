@@ -1,0 +1,50 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://aof-s.io/schemas/resolve_incident_response.json",
+  "title": "Resolve Incident Response",
+  "description": "Respuesta del orquestador tras coordinar la resolución de un incidente en el ecosistema.",
+  "type": "object",
+  "properties": {
+    "incident_id": {
+      "type": "string",
+      "description": "Identificador del incidente resuelto."
+    },
+    "status": {
+      "type": "string",
+      "enum": ["resolved", "mitigated", "escalated", "false_positive"],
+      "description": "Estado final del incidente."
+    },
+    "resolution": {
+      "type": "string",
+      "description": "Descripción de las acciones tomadas para resolver el incidente."
+    },
+    "resolution_time_seconds": {
+      "type": "number",
+      "description": "Tiempo total desde la detección hasta la resolución."
+    },
+    "agents_involved": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Lista de agentes que participaron en la resolución."
+    },
+    "hypothesis_id": {
+      "type": "string",
+      "description": "Identificador de la hipótesis formulada durante la resolución."
+    },
+    "hypothesis_result": {
+      "type": "string",
+      "enum": ["validated", "falsified", "pending_reflection"],
+      "description": "Resultado de la validación de la hipótesis tras la resolución."
+    },
+    "root_cause": {
+      "type": "string",
+      "description": "Causa raíz identificada (si se determinó)."
+    },
+    "lessons_learned": {
+      "type": "string",
+      "description": "Lecciones aprendidas para prevenir incidentes similares."
+    }
+  },
+  "required": ["incident_id", "status", "resolution", "resolution_time_seconds", "hypothesis_result"],
+  "additionalProperties": false
+}
