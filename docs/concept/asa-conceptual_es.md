@@ -945,9 +945,6 @@ El Modelo ASA representa una evolución fundamental en la arquitectura de agente
 ASA no es una propuesta teórica: está materializado en el estándar abierto AOF‑S, que proporciona plantillas listas para usar, una CLI de orquestación (`noctl`) y una pila de protocolos (A2A, MCP, NSL) que lo integran con el ecosistema de agentes existente.
 
 ---
-
-**Versión:** 2.0
-**Fecha:** 13 de junio de 2026
 **Autores:** Jorge Y. Hernández García (ETKinnova), DeepSeek (DeepThink) como asistente de diseño sistémico.
 **Parte del estándar:** AOF‑S v1.0
 ```
