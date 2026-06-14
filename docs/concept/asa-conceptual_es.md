@@ -2,8 +2,8 @@
 
 **Propósito:** Este documento desarrolla los fundamentos teóricos y conceptuales del Modelo ASA (Agentes Sistémicos Adaptativos). Complementa la especificación ejecutable (`spec/asa.yaml`) con la narrativa que explica el "por qué" y el "cómo" de cada decisión de diseño. Está dirigido a investigadores, arquitectos de agentes y cualquier persona interesada en comprender los pilares teóricos sobre los que se construye AOF‑S.
 
-**Versión:** 1.0  
-**Fecha:** 8 de junio de 2026  
+**Versión:** 1.1
+**Fecha:** 13 de junio de 2026
 **Parte del estándar:** AOF‑S v1.0
 
 ---
@@ -13,13 +13,18 @@
 1. [Fundamentos Teóricos](#1-fundamentos-teóricos)
 2. [Principio de Intervención Reflexiva Causal](#2-principio-de-intervención-reflexiva-causal)
 3. [Los Tres Niveles de Agencia Progresiva](#3-los-tres-niveles-de-agencia-progresiva)
-4. [El Ciclo ASA de 7 Fases](#4-el-ciclo-asa-de-7-fases)
-5. [Memoria Cuádruple y Meta‑Cognición](#5-memoria-cuádruple-y-meta-cognición)
-6. [Grafo Causal Probabilístico](#6-grafo-causal-probabilístico)
-7. [Meta‑Cognición y Razonamiento Neuro‑Simbólico Híbrido](#7-meta-cognición-y-razonamiento-neuro-simbólico-hibrido)
-8. [Gobernanza Algorítmica](#8-gobernanza-algorítmica)
-9. [Principio Local‑First](#9-principio-local-first)
-10. [Relación con AOF‑S y el Noosistema](#10-relación-con-aof-s-y-el-noosistema)
+4. [Cuándo Usar Cada Nivel: Complejidad Justificada](#4-cuándo-usar-cada-nivel-complejidad-justificada)
+5. [El Ciclo ASA de 7 Fases](#5-el-ciclo-asa-de-7-fases)
+6. [ASA en el Contexto de otros Paradigmas](#6-asa-en-el-contexto-de-otros-paradigmas)
+7. [Memoria Cuádruple](#7-memoria-cuádruple)
+8. [Meta Cognición y Razonamiento Neuro Simbólico Híbrido](#8-meta-cognición-y-razonamiento-neuro-simbólico-híbrido)
+9. [Grafo Causal Probabilístico](#9-grafo-causal-probabilístico)
+10. [Estándares y Herramientas Abiertas](#10-estándares-y-herramientas-abiertas)
+11. [Modos de Operación del N3: Degradación Graciosa y Delegación Inteligente](#11-modos-de-operación-del-n3-degradación-graciosa-y-delegación-inteligente)
+12. [Gobernanza Algorítmica y Seguridad](#12-gobernanza-algorítmica-y-seguridad)
+13. [Principio Local‑First](#13-principio-local-first)
+14. [Relación con AOF‑S y el Noosistema](#14-relación-con-aof-s-y-el-noosistema)
+15. [Limitaciones y Hoja de Ruta](#15-limitaciones-y-hoja-de-ruta)
 
 ---
 
@@ -77,13 +82,11 @@ El principio rector del Modelo ASA es la **Intervención Reflexiva Causal**, que
 | Sin distinción de niveles de agencia. | Tres niveles progresivos (Reactivo, Sistémico, Orquestado). |
 | La memoria es un log plano o inexistente. | Memoria cuádruple con mecanismos de olvido y fortalecimiento. |
 
----
-
-# Modelo ASA: Agentes Sistémicos Adaptativos — Documento Conceptual (Continuación)
-
 ## 3. Los Tres Niveles de Agencia Progresiva
 
-Uno de los principios fundacionales del Modelo ASA es la **agencia progresiva**: la complejidad se activa solo en el nivel que la requiere. Un agente no nace complejo; evoluciona desde una configuración mínima (2 archivos, 5 minutos) hasta un orquestador de ecosistemas completo. Esta progresividad responde a tres necesidades prácticas:
+Uno de los principios fundacionales del Modelo ASA es la **agencia progresiva**: la complejidad se activa solo en el nivel que la requiere. Un agente no nace complejo; evoluciona desde una configuración mínima (2 archivos, 5 minutos) hasta un orquestador de ecosistemas completo.
+
+Esta progresividad responde a tres necesidades prácticas:
 
 1. **Barrera de entrada mínima:** Un desarrollador que solo necesita un agente reactivo no debería verse obligado a configurar memoria, grafos causales o políticas de seguridad.
 2. **Eficiencia de recursos:** No todas las tareas requieren simulación contrafactual o meta‑cognición. Un agente de Nivel 1 consume ~2‑4k tokens; uno de Nivel 3, ~7‑12k.
@@ -152,11 +155,40 @@ Un agente no nace en Nivel 3. La progresión sigue un flujo declarativo gestiona
 1. **Nivel 1 → Nivel 2:** El agente acumula suficientes episodios y detecta patrones recurrentes. El usuario u orquestador autoriza la migración con `noctl upgrade --level 2`. Se añaden los directorios `world_model/`, `memory/` y el archivo `hypothesis.md`.
 2. **Nivel 2 → Nivel 3:** El agente demuestra capacidad de modelado causal (hipótesis validadas > umbral) y recibe autorización para orquestar. Se añaden `ASA.yaml`, `expert_corpus/`, `registry.yaml`, `causal_graph.proto` y skills avanzadas.
 
-## 4. El Ciclo ASA de 7 Fases
+## 4. Cuándo Usar Cada Nivel: Complejidad Justificada
 
-El ciclo ASA es el corazón operativo del modelo. Define cómo un agente procesa una necesidad, formula una intervención y aprende de sus consecuencias. No es un bucle genérico de "percibir‑actuar": es un ciclo de razonamiento causal estructurado en siete fases, con profundidad variable según el nivel de agencia.
+ASA no obliga a usar el N3 en todos los casos. El ciclo de 7 fases está diseñado para dominios donde la causalidad, la verificación simbólica y el aprendizaje acumulativo son necesarios. Para el resto, existen N1 y N2.
 
-### 4.1 Visión General
+### 4.1 Escenarios recomendados por nivel
+
+| Escenario | Nivel ASA recomendado | Razón |
+|:---|:---|:---|
+| Chatbot simple con herramientas | N1 (Reactivo) | 4 fases, sin sobrecarga. |
+| Tarea de una sola llamada a API | N1 (Reactivo) | Sin hipótesis ni reflexión. |
+| Hardware edge (RPi, móvil) | N1 (Reactivo) o N2 ligero | Sin motor simbólico ni meta‑cognición. |
+| Dominio sin causalidad clara | N2 (Sistémico) | Grafo causal opcional; el agente puede operar solo con memoria. |
+| Sistema con efectos de orden superior | **N3 (Orquestado)** | Aquí ASA justifica su complejidad. |
+| Verificación lógica obligatoria (salud, finanzas) | **N3 (Orquestado)** | La capa simbólica es necesaria. |
+
+### 4.2 Ejemplo de despliegue en fase Enjambre
+
+La tabla siguiente ilustra cómo los tres niveles de agencia coexisten en un Noosistema maduro (fase Enjambre), distribuyéndose en las capas de despliegue según su función:
+
+| Cantidad | Nivel | Rol | Capa de despliegue | Notas |
+|:---|:---|:---|:---|:---|
+| 1 | N3 | Director de orquesta (completo) | C5 (Cloud) | Ciclo de 7 fases. Gobernanza global. |
+| 1 | N3 | Orquestador Edge (degradado) | C3 (Edge) | Ciclo de 5 fases. Gobernanza local. Escala a C5 cuando es necesario. |
+| 10 | N2 | Especialistas (DB, energía, seguridad, clínica...) | C4 (Cloud) o C3 (Edge) | Sin capacidad de orquestación. |
+| 30 | N1 | Ejecutores | C3 (Edge) | Tareas de frecuencia media. |
+| 5 | N1 | Sensores y actuadores | C1 (Campo) | Tareas de alta frecuencia. Ultra‑light. |
+
+---
+
+## 5. El Ciclo ASA de 7 Fases
+
+El ciclo ASA es el corazón operativo del modelo. Define cómo un agente procesa una necesidad, formula una intervención y aprende de sus consecuencias.
+
+### 5.1 Visión General
 
 | # | Fase | N1 | N2 | N3 | Descripción |
 |---|------|----|----|----|-------------|
@@ -168,7 +200,7 @@ El ciclo ASA es el corazón operativo del modelo. Define cómo un agente procesa
 | 6 | **Evaluar** | ✅ | ✅ | ✅ | Registro de métricas, detección de anomalías y comparación con la hipótesis. |
 | 7 | **Reflexionar** | — | ✅ | ✅ | Actualización del modelo del mundo, memorias y (en N3) estrategias de razonamiento. |
 
-### 4.2 Fase 1: Arranque
+### 5.2 Fase 1: Arranque
 
 El agente carga los artefactos mínimos necesarios para comprender quién es, qué debe hacer y en qué contexto opera.
 
@@ -179,7 +211,7 @@ El agente carga los artefactos mínimos necesarios para comprender quién es, qu
 
 **Equivalencia con el ciclo cerrado del Holosistema TIC:** Esta fase corresponde a la **Percepción** inicial del sistema: el agente se sincroniza con el gemelo digital y el bus de eventos para obtener el estado actual.
 
-### 4.3 Fase 2: Razonar
+### 5.3 Fase 2: Razonar
 
 El agente contextualiza la tarea y genera inferencias iniciales. La profundidad de esta fase varía según el nivel:
 
@@ -189,7 +221,7 @@ El agente contextualiza la tarea y genera inferencias iniciales. La profundidad 
 
 **Fundamento teórico:** Esta fase materializa la distinción de Kahneman entre Sistema 1 (respuestas rápidas, procedurales) y Sistema 2 (razonamiento deliberado, meta‑cognitivo). En N1 predomina el Sistema 1; en N3 se activa el Sistema 2 con selección estratégica.
 
-### 4.4 Fase 3: Hipótesis
+### 5.4 Fase 3: Hipótesis
 
 El agente formula una hipótesis de intervención con predicciones cuantitativas de sus efectos. Esta fase es el núcleo del principio de Intervención Reflexiva Causal.
 
@@ -207,7 +239,7 @@ El agente formula una hipótesis de intervención con predicciones cuantitativas
   (bucle de refuerzo), causando presión adicional en DB en ~3h.
 ```
 
-### 4.5 Fase 4: Verificar (Exclusiva de N3)
+### 5.5 Fase 4: Verificar (Exclusiva de N3)
 
 Esta fase es la materialización del **razonamiento neuro‑simbólico híbrido**. Un motor de reglas lógicas (CLIPS, Drools) valida la hipótesis generada por el LLM contra:
 
@@ -219,7 +251,7 @@ Si la validación falla, la hipótesis se rechaza antes de la ejecución y se re
 
 **Fundamento teórico:** Los LLM son potentes pero no deterministas. El motor de reglas lógicas actúa como un guardarraíl que asegura que las hipótesis cumplan las políticas de seguridad y los contratos semánticos antes de ejecutarse. Esta combinación de razonamiento neuronal (LLM) y simbólico (motor de reglas) es lo que denominamos razonamiento neuro‑simbólico híbrido.
 
-### 4.6 Fase 5: Ejecutar
+### 5.6 Fase 5: Ejecutar
 
 El agente ejecuta los pasos derivados de la hipótesis. La ejecución es monitorizada:
 
@@ -230,7 +262,7 @@ El agente ejecuta los pasos derivados de la hipótesis. La ejecución es monitor
 - **N1:** Ejecuta tareas atómicas (health check, ingesta de logs) sin monitorización avanzada.
 - **N2/N3:** Ejecutan pasos complejos con monitorización de métricas y watchdog.
 
-### 4.7 Fase 6: Evaluar
+### 5.7 Fase 6: Evaluar
 
 El agente recolecta métricas, detecta anomalías y compara el resultado real con la hipótesis formulada en la fase 3.
 
@@ -249,7 +281,7 @@ El agente recolecta métricas, detecta anomalías y compara el resultado real co
   deviation: "-1% (predicho 88%)"
 ```
 
-### 4.8 Fase 7: Reflexionar
+### 5.8 Fase 7: Reflexionar
 
 El agente cierra el ciclo de aprendizaje. Compara los resultados reales con la hipótesis y actualiza su conocimiento:
 
@@ -269,11 +301,32 @@ El agente cierra el ciclo de aprendizaje. Compara los resultados reales con la h
 **N1 (Cierre sistémico):**
 - El agente N1 no reflexiona localmente, pero sus evaluaciones se persisten en la **memoria colectiva del Noosistema**. Los agentes N2 y N3 pueden consumir esas evaluaciones durante sus propias fases de reflexión para mejorar sus modelos.
 
-## 5. Memoria Cuádruple y Meta‑Cognición
+## 6. ASA en el Contexto de otros Paradigmas
+
+Para comprender el posicionamiento de ASA, se presenta una comparación con los paradigmas de razonamiento más extendidos en 2026.
+
+### 6.1 Tabla Comparativa de Bucles de Razonamiento
+
+| Fase ASA | N1 | N2 | N3 | 🔄 ReAct | 🔁 Reflexion | 📋 Plan‑and‑Execute | 🌳 ToT / GoT |
+|:---|:---:|:---:|:---:|:---|:---|:---|:---|
+| **1. Arranque** | ✅ | ✅ | ✅ | — (No tiene fase de inicialización explícita; comienza directamente con Pensar). | — (Comienza directamente con Actuar). | — (Comienza directamente con Planificar). | — (Comienza directamente con la descomposición del problema). |
+| **2. Razonar** | ✅ | ✅ | ✅ | **Pensar (Thought)**: El LLM analiza la situación y decide el siguiente paso. | — (No tiene fase de razonamiento explícita; va directo a la acción). | **Planificar (Plan)**: Un agente descompone el objetivo en una lista de pasos. | **Descomposición / Generación de Pensamientos**: El problema se divide en múltiples ideas o caminos potenciales. |
+| **3. Hipótesis** | — | ✅ | ✅ | — | — | — | — |
+| **4. Verificar** | — | — | ✅ | — | — | — | — |
+| **5. Ejecutar** | ✅ | ✅ | ✅ | **Actuar (Act)**: Ejecuta la acción planificada (API, búsqueda, herramienta). | **Actuar (Act)**: Ejecuta una acción para resolver la tarea. | **Ejecutar (Execute)**: Un ejecutor sigue los pasos del plan predefinido. | — (La ejecución no es el foco; se centra en explorar caminos de razonamiento). |
+| **6. Evaluar** | ✅ | ✅ | ✅ | **Observar (Observe)**: Incorpora el resultado de la acción al contexto para la siguiente iteración. | **Evaluar (Evaluate)**: Un componente crítico evalúa la calidad de la respuesta generada. | — (La evaluación es implícita; el planificador puede revisar los pasos restantes según los resultados). | **Evaluación de Pensamientos**: Se puntúa o selecciona qué caminos de razonamiento son más prometedores. |
+| **7. Reflexionar** | — | ✅ | ✅ | — (No tiene fase de reflexión; simplemente itera). | **Reflexionar (Reflect)**: Genera una reflexión sobre qué salió mal y qué se puede aprender del error. | — (No tiene fase de reflexión; el bucle termina al ejecutar todos los pasos). | **Selección / Estrategia**: Se decide qué camino seguir o se fusionan y retroalimentan ideas entre diferentes partes de la estructura. |
+| **Cierre de ciclo** | Sistémico (memoria colectiva) | Local | Local + Sistémico | **Iteración**: Repite Pensar → Actuar → Observar hasta alcanzar el objetivo. | **Memoria**: Las reflexiones se almacenan como memoria episódica para mejorar en futuros intentos. | **Finalización**: El bucle termina una vez que todos los pasos del plan han sido ejecutados. | **Iteración**: El proceso de generación y evaluación se repite hasta converger en una solución. |
+
+### 6.2 Conclusión Comparativa
+
+ASA no compite con estos paradigmas en todos los frentes. En tareas simples, ReAct o Plan‑and‑Execute son más eficientes. ASA justifica su complejidad en dominios con causalidad no trivial, necesidad de verificación formal y aprendizaje acumulativo. La tabla "Cuándo Usar Cada Nivel" guía al adoptante hacia la configuración adecuada.
+
+## 7. Memoria Cuádruple
 
 La memoria es uno de los pilares diferenciales del Modelo ASA. Mientras que la mayoría de los frameworks de agentes tratan la memoria como un simple almacén de logs o un vector store indiferenciado, ASA distingue cuatro tipos de memoria con funciones cognitivas específicas, inspiradas en la arquitectura ACT‑R [4] y extendidas con mecanismos de olvido, fortalecimiento y meta‑cognición.
 
-### 5.1 Fundamento Teórico: Más Allá de ACT‑R
+### 7.1 Fundamento Teórico: Más Allá de ACT‑R
 
 La arquitectura cognitiva ACT‑R distingue entre:
 
@@ -286,9 +339,11 @@ ASA extiende este modelo con dos aportaciones originales:
 
 2. **Memoria meta‑cognitiva:** Esta es una aportación enteramente original de ASA. No existe en ACT‑R ni en la mayoría de arquitecturas cognitivas artificiales. Permite que el agente no solo aprenda sobre el mundo, sino que aprenda sobre sus propias estrategias de razonamiento: cuál funciona mejor en cada dominio, con qué latencia y con qué tasa de éxito.
 
-### 5.2 Los Cuatro Tipos de Memoria
+### 7.2 Los Cuatro Tipos de Memoria
 
-#### 5.2.1 Memoria Episódica
+#### 7.2.1 Memoria Episódica
+
+Almacena reglas generales, hechos del dominio y patrones causales extraídos de la experiencia. Cada regla incluye parámetros de ciclo de vida (`confidence`, `last_accessed`, `access_count`, `decay_rate`) que permiten el olvido por desuso y el fortalecimiento por uso.
 
 **Función:** Almacenar la secuencia temporal de intervenciones del agente, con su contexto completo, la hipótesis formulada, la acción tomada y el resultado observado.
 
@@ -322,7 +377,8 @@ Latencia volvió a 50ms en p95.
 Verificar índices antes de añadir funcionalidades de búsqueda.
 ```
 
-#### 5.2.2 Memoria Semántica
+#### 7.2.2 Memoria Semántica
+Almacena reglas generales, hechos del dominio y patrones causales extraídos de la experiencia. Cada regla incluye parámetros de ciclo de vida (`confidence`, `last_accessed`, `access_count`, `decay_rate`) que permiten el olvido por desuso y el fortalecimiento por uso.
 
 **Función:** Almacenar reglas generales, hechos del dominio y patrones causales extraídos de la experiencia. A diferencia de la memoria episódica (que almacena eventos concretos), la semántica almacena conocimiento abstracto y generalizable.
 
@@ -352,7 +408,8 @@ Verificar índices antes de añadir funcionalidades de búsqueda.
   tags: ["checkout", "performance", "traffic", "reinforcing_loop"]
 ```
 
-#### 5.2.3 Memoria Procedural
+#### 7.2.3 Memoria Procedural
+Almacena políticas de acción que automatizan respuestas rápidas ante situaciones recurrentes. 
 
 **Función:** Almacenar políticas de acción que automatizan respuestas rápidas ante situaciones recurrentes. Es el equivalente al Sistema 1 de Kahneman: respuestas automáticas, de baja latencia, que no requieren razonamiento deliberado.
 
@@ -372,7 +429,8 @@ policies:
     source: "H000-2026-06-07 (validated)"
 ```
 
-#### 5.2.4 Memoria Meta‑Cognitiva (Exclusiva de N3)
+#### 7.2.4 Memoria Meta‑Cognitiva (Exclusiva de N3)
+Almacena el rendimiento histórico de las estrategias de razonamiento utilizadas, permitiendo la selección dinámica de la más adecuada para cada tarea.
 
 **Función:** Almacenar el rendimiento histórico de las estrategias de razonamiento utilizadas por el agente. Permite la selección dinámica de la estrategia más adecuada para cada tarea.
 
@@ -407,7 +465,7 @@ meta_cognitive:
       last_used: "2026-06-07T09:30:00Z"
 ```
 
-### 5.3 Mecanismos de Olvido y Fortalecimiento
+### 7.3 Mecanismos de Olvido y Fortalecimiento
 
 La memoria del ASA no es estática: evoluciona con la experiencia mediante mecanismos matemáticos de olvido y fortalecimiento, inspirados en la psicología cognitiva y la neurociencia.
 
@@ -419,12 +477,138 @@ La memoria del ASA no es estática: evoluciona con la experiencia mediante mecan
 
 **Consolidación:** Los patrones recurrentes detectados en la memoria episódica se consolidan en reglas semánticas y políticas procedurales. Por ejemplo, si el agente observa repetidamente que "los picos de latencia fuera de hora pico correlacionan con campañas de marketing", esta observación se promueve de episodio a regla semántica.
 
+## 8. Meta Cognición y Razonamiento Neuro Simbólico Híbrido
 
-## 6. Grafo Causal Probabilístico
+El Nivel 3 (Orquestado) incorpora dos capacidades que lo distinguen radicalmente de los niveles inferiores y de la mayoría de los frameworks de agentes existentes: la **meta‑cognición** y el **razonamiento neuro‑simbólico híbrido**. Ambas trabajan en conjunto: la meta‑cognición selecciona la mejor estrategia para razonar; el motor neuro‑simbólico verifica que la hipótesis generada cumple todas las políticas antes de ejecutarse.
+
+### 8.1 Meta‑Cognición: Aprender a Razonar Mejor
+
+#### 8.1.1 Fundamento Teórico
+
+La meta‑cognición es la capacidad de reflexionar sobre los propios procesos de pensamiento. En psicología cognitiva, se distingue entre:
+
+- **Conocimiento meta‑cognitivo:** Saber qué estrategias de razonamiento existen y en qué contextos funcionan mejor.
+- **Regulación meta‑cognitiva:** Seleccionar y ajustar dinámicamente la estrategia más adecuada para cada tarea.
+
+ASA implementa ambas dimensiones en su memoria meta‑cognitiva.
+
+#### 8.1.2 Estrategias de Razonamiento como Objetos de Primera Clase
+
+En el ASA, las estrategias de razonamiento no están hardcodeadas. Son objetos de primera clase almacenados en la memoria meta‑cognitiva con métricas de rendimiento:
+
+| Estrategia | Descripción | Latencia típica | Mejor dominio |
+|------------|-------------|-----------------|---------------|
+| **Chain‑of‑Thought (CoT)** | Razonamiento paso a paso en lenguaje natural. | 3‑5 segundos | Generación de código, debugging, documentación. |
+| **Tree‑of‑Thoughts (ToT)** | Exploración de múltiples ramas de razonamiento, con poda y selección. | 10‑15 segundos | Planificación arquitectónica, coordinación multi‑agente, evaluación de riesgos. |
+| **Causal Simulation** | Simulación contrafactual con MCTS sobre el Grafo Causal Probabilístico. | 8‑12 segundos | Optimización de infraestructura, respuesta a incidentes, planificación de capacidad. |
+
+Cada estrategia registra:
+- **success_rate:** Proporción de hipótesis validadas vs. falsadas cuando se usó esta estrategia.
+- **avg_latency_ms:** Tiempo promedio de ejecución.
+- **domains:** Lista de dominios donde ha demostrado ser efectiva.
+- **last_used:** Timestamp del último uso.
+
+#### 8.1.3 Selección Dinámica de Estrategia
+
+Durante la fase de Razonar (fase 2), el agente N3 consulta su memoria meta‑cognitiva y selecciona la estrategia más adecuada para la tarea actual:
+
+1. **Identificar el dominio de la tarea** (ej: "infraestructura", "código", "planificación").
+
+2. **Filtrar estrategias** que hayan demostrado efectividad en ese dominio.
+
+3. **Seleccionar la de mayor success_rate**, ponderada por latencia (si la tarea es urgente, se penalizan las estrategias lentas).
+
+4. **Ejecutar el razonamiento** con la estrategia seleccionada.
+
+5. **Registrar el rendimiento** en la memoria meta‑cognitiva tras la reflexión (fase 7).
+
+**Ejemplo:**
+```
+Agente N3, fase Razonar:
+  Tarea: "Optimizar la latencia del checkout en producción".
+  Dominio identificado: infrastructure_optimization.
+  
+  Consulta a memoria meta‑cognitiva:
+    - CoT: success_rate 0.87, domains: ["code_generation", "debugging"]
+    - Causal Simulation: success_rate 0.92, domains: ["infrastructure_optimization", "incident_response"]
+    - ToT: success_rate 0.78, domains: ["architectural_planning", "multi_agent_coordination"]
+  
+  Selección: Causal Simulation (mayor success_rate en el dominio, 0.92).
+  Decisión: "Usaré simulación causal para predecir los efectos de la intervención."
+```
+
+### 8.2 Razonamiento Neuro‑Simbólico Híbrido: La Fase Verificar
+
+#### 8.2.1 Fundamento Teórico
+
+Los LLM son potentes pero no deterministas. Pueden generar hipótesis creativas, pero también pueden alucinar, violar restricciones de seguridad o proponer acciones que incumplen contratos semánticos. El razonamiento neuro‑simbólico híbrido combina:
+
+- **Razonamiento neuronal (LLM):** Flexibilidad, creatividad, comprensión del lenguaje natural, capacidad de generalización.
+- **Razonamiento simbólico (Motor de reglas):** Determinismo, verificabilidad, cumplimiento estricto de políticas, trazabilidad.
+
+La fase Verificar (fase 4, exclusiva de N3) es la materialización de esta combinación: el LLM genera la hipótesis; el motor de reglas la valida antes de ejecutarla.
+
+#### 8.2.2 Componentes del Motor de Verificación
+
+El motor de verificación se apoya en tres fuentes de reglas:
+
+1. **Contratos semánticos (JSON Schema):** Declarados en `ASA.yaml` para cada capacidad del agente. Especifican el formato y las restricciones de las entradas y salidas.
+
+2. **Políticas de seguridad (OPA):** Declaradas en `Noosfile.yaml`. Definen qué acciones están permitidas para cada nivel de agencia y en qué condiciones.
+
+3. **Restricciones constitucionales:** Declaradas en `constitution.md`. Principios inviolables que el agente no puede transgredir bajo ninguna circunstancia.
+
+#### 8.2.3 Flujo de Verificación
+
+1. **Entrada:** La hipótesis generada por el LLM en la fase 3.
+
+2. **Validación de contratos semánticos:** El motor verifica que los parámetros de la acción propuesta cumplen los JSON Schema declarados en `ASA.yaml`. Por ejemplo: ¿el nombre de la base de datos cumple el patrón `^[a-z][a-z0-9_]*$`? ¿El tamaño está entre 1 y 1000 GB?
+
+3. **Validación de políticas de seguridad:** El motor consulta las políticas OPA declaradas en `Noosfile.yaml`. Por ejemplo: ¿el agente que propone la acción tiene nivel suficiente? ¿La acción está permitida para ese nivel?
+
+4. **Validación constitucional:** El motor verifica que la acción no viola ningún principio de `constitution.md`. Por ejemplo: ¿la intervención afecta a zonas críticas (UCI, quirófanos)? ¿Se compromete la autonomía de baterías para equipos de soporte vital?
+
+5. **Resultado:**
+   - **Autorizado:** La hipótesis pasa a la fase de Ejecutar (fase 5).
+   - **Rechazado:** La hipótesis se bloquea, se registra en el ledger de auditoría con el motivo del rechazo y se notifica al orquestador.
+
+#### 8.2.4 Ejemplo de Verificación
+
+```
+Agente N3 (hospital), fase Verificar:
+  Hipótesis H018: "Pre‑enfriar consultas externas (22→20°C) entre 13:00‑14:00."
+
+  Validación de contratos semánticos:
+    ✅ Zona "consultas_externas" existe en el modelo del mundo.
+    ✅ Temperatura objetivo (20°C) está dentro del rango permitido (18‑26°C).
+
+  Validación de políticas OPA:
+    ✅ Agente energy‑agent (N2) está autorizado para modificar HVAC.
+    ✅ La zona "consultas_externas" no es una zona crítica (UCI, quirófanos).
+
+  Validación constitucional:
+    ✅ No se compromete la autonomía de baterías (SOC mínimo garantizado).
+    ✅ Las temperaturas previstas cumplen la norma (máx 24°C transitorio).
+
+  Resultado: AUTORIZADO. Hipótesis H018 pasa a Ejecutar.
+```
+
+### 8.3 Sinergia entre Meta‑Cognición y Verificación Neuro‑Simbólica
+
+La combinación de meta‑cognición y verificación neuro‑simbólica crea un ciclo virtuoso en el N3:
+
+1. **La meta‑cognición** selecciona la mejor estrategia de razonamiento para la tarea.
+2. **El LLM** (razonamiento neuronal) genera una hipótesis creativa y contextualizada.
+3. **El motor de reglas** (razonamiento simbólico) verifica que la hipótesis cumple todas las políticas.
+4. **La reflexión** (fase 7) actualiza la memoria meta‑cognitiva con el rendimiento real de la estrategia utilizada.
+
+Este ciclo permite que el agente no solo aprenda sobre el mundo (a través del Grafo Causal y la memoria semántica), sino que **aprenda a aprender**: mejora sus propias estrategias de razonamiento con la experiencia.
+
+## 9. Grafo Causal Probabilístico
 
 El Grafo Causal Probabilístico es el núcleo del modelo del mundo del ASA. A diferencia de otros frameworks que modelan relaciones causales de forma determinista ("X causa Y"), ASA modela la incertidumbre inherente a cualquier intervención mediante distribuciones de probabilidad condicional P(Y | do(X)). Esto permite al agente cuantificar su incertidumbre, simular contrafactuales con intervalos de confianza y refinar sus predicciones a medida que acumula experiencia.
 
-### 6.1 Fundamento Teórico: Causalidad Probabilística
+### 9.1 Fundamento Teórico: Causalidad Probabilística
 
 El marco de inferencia causal desarrollado por Judea Pearl [5] introdujo el operador `do(X)` para distinguir entre:
 
@@ -435,11 +619,11 @@ La diferencia es fundamental. Observar que los pacientes que toman un medicament
 
 **Implicación para ASA:** Los agentes no son observadores pasivos; son interventores activos. Cuando un agente decide "añadir un índice en la base de datos", está ejecutando `do(índice)`. El Grafo Causal Probabilístico modela exactamente esta semántica: cada arista almacena P(efecto | do(causa)), y el agente actualiza estas distribuciones tras cada intervención real.
 
-### 6.2 Estructura del Grafo
+### 9.2 Estructura del Grafo
 
 El Grafo Causal Probabilístico se materializa en el archivo `causal_graph.proto`, un esquema protobuf con tres componentes principales:
 
-#### 6.2.1 Nodos (CausalNode)
+#### 9.2.1 Nodos (CausalNode)
 
 Cada nodo representa una variable del sistema. Los nodos se clasifican en cuatro tipos:
 
@@ -452,7 +636,7 @@ Cada nodo representa una variable del sistema. Los nodos se clasifican en cuatro
 
 Cada nodo incluye su valor actual, su unidad de medida y una referencia al Gemelo Digital Unificado (Tejido T3) para su sincronización con el estado real del sistema.
 
-#### 6.2.2 Aristas (CausalEdge)
+#### 9.2.2 Aristas (CausalEdge)
 
 Cada arista representa una relación causal dirigida desde un nodo causa hasta un nodo efecto. Las aristas se clasifican en tres tipos:
 
@@ -464,7 +648,7 @@ Cada arista representa una relación causal dirigida desde un nodo causa hasta u
 
 Cada arista especifica el orden del efecto (1º, 2º o 3º orden) y una referencia a la distribución de retardo correspondiente en `delays.yaml`.
 
-#### 6.2.3 Distribuciones de Probabilidad (ProbabilityDistribution)
+#### 9.2.3 Distribuciones de Probabilidad (ProbabilityDistribution)
 
 Cada arista tiene asociada una distribución de probabilidad condicional que modela P(efecto | do(causa)). ASA soporta cinco tipos de distribuciones:
 
@@ -483,7 +667,7 @@ Cada distribución incluye:
 - **sample_size:** Número de observaciones utilizadas para estimar los parámetros.
 - **last_updated:** Timestamp de la última actualización.
 
-### 6.3 Actualización por Reflexión
+### 9.3 Actualización por Reflexión
 
 El Grafo Causal Probabilístico no es estático. Se actualiza en cada ciclo de reflexión (fase 7) mediante inferencia bayesiana:
 
@@ -513,7 +697,7 @@ Actualización por reflexión:
   - evidence_source: "H012-2026-06-07 (validated, minor deviation)"
 ```
 
-### 6.4 Diferencia con Modelos Deterministas
+### 9.4 Diferencia con Modelos Deterministas
 
 La mayoría de los frameworks de agentes que modelan causalidad lo hacen de forma determinista: "si añado un índice, la latencia bajará a 20ms". ASA adopta un enfoque probabilístico por tres razones:
 
@@ -526,7 +710,7 @@ La mayoría de los frameworks de agentes que modelan causalidad lo hacen de form
 
 La evidencia empírica respalda este enfoque. El estudio MAGMA (abril 2026) demostró que eliminar los grafos causales en agentes reduce la precisión en un 24.6%. ASA ya incorpora esta lección desde su diseño fundacional.
 
-### 6.5 Integración con la Simulación Contrafactual
+### 9.5 Integración con la Simulación Contrafactual
 
 Durante la fase de Hipótesis (fase 3), el agente N3 utiliza el Grafo Causal Probabilístico para ejecutar simulaciones contrafactuales mediante Monte Carlo Tree Search (MCTS):
 
@@ -540,139 +724,74 @@ Durante la fase de Hipótesis (fase 3), el agente N3 utiliza el Grafo Causal Pro
 
 Esta capacidad de simular contrafactuales distingue al ASA de los agentes reactivos: no solo reacciona al estado actual del sistema, sino que explora proactivamente escenarios alternativos antes de comprometerse con una acción.
 
+## 10. Estándares y Herramientas Abiertas
 
-## 7. Meta‑Cognición y Razonamiento Neuro‑Simbólico Híbrido
+La arquitectura ASA se construye sobre un ecosistema de **estándares abiertos y herramientas de código abierto**, garantizando la interoperabilidad, la portabilidad y la ausencia de dependencias de software propietario.
 
-El Nivel 3 (Orquestado) incorpora dos capacidades que lo distinguen radicalmente de los niveles inferiores y de la mayoría de los frameworks de agentes existentes: la **meta‑cognición** y el **razonamiento neuro‑simbólico híbrido**. Ambas trabajan en conjunto: la meta‑cognición selecciona la mejor estrategia para razonar; el motor neuro‑simbólico verifica que la hipótesis generada cumple todas las políticas antes de ejecutarse.
+### 10.1 Principio de no dependencia propietaria
 
-### 7.1 Meta‑Cognición: Aprender a Razonar Mejor
+ASA se adhiere al principio de que **ningún componente esencial del ecosistema debe depender de software propietario o de un proveedor específico**. Las únicas menciones a servicios comerciales (como OpenAI o Anthropic) son como ejemplos de fallback opcional para la inferencia en la nube, configurable y desactivado por defecto.
 
-#### 7.1.1 Fundamento Teórico
+### 10.2 Estándares y protocolos adoptados
 
-La meta‑cognición es la capacidad de reflexionar sobre los propios procesos de pensamiento. En psicología cognitiva, se distingue entre:
+| Estándar | Uso en ASA | Gobernanza | Licencia |
+| :--- | :--- | :--- | :--- |
+| **A2A (Agent-to-Agent)** | Comunicación y delegación de tareas entre agentes. | Linux Foundation | Especificación abierta |
+| **MCP (Model Context Protocol)** | Conexión de agentes a herramientas y fuentes de datos. | Anthropic (estándar abierto) | Especificación abierta |
+| **SLIM / AGNTCY** | Capa de mensajería segura y de baja latencia. | Cisco / Linux Foundation | Especificación abierta |
+| **SPIFFE** | Identidad verificable para cargas de trabajo (agentes). | CNCF (Graduated) | Especificación abierta |
+| **OPA (Open Policy Agent)** | Motor de políticas de autorización declarativas. | CNCF (Graduated) | Apache 2.0 |
+| **mTLS** | Cifrado extremo a extremo en las comunicaciones. | IETF | Estándar abierto |
+| **JSON Schema / Protobuf** | Definición de contratos semánticos y estructura de datos. | OpenJS / Google | Open source |
 
-- **Conocimiento meta‑cognitivo:** Saber qué estrategias de razonamiento existen y en qué contextos funcionan mejor.
-- **Regulación meta‑cognitiva:** Seleccionar y ajustar dinámicamente la estrategia más adecuada para cada tarea.
+### 10.3 Herramientas open source de la arquitectura
 
-ASA implementa ambas dimensiones en su memoria meta‑cognitiva.
+| Herramienta | Función | Licencia |
+| :--- | :--- | :--- |
+| **Ollama** | Inferencia local simplificada (desarrollo y prototipado). | MIT |
+| **llama.cpp** | Inferencia local con control fino y portabilidad extrema. | MIT |
+| **vLLM** | Inferencia local de alto rendimiento para cargas concurrentes. | Apache 2.0 |
+| **CLIPS** | Motor de reglas simbólicas para la fase "Verificar". | Dominio público |
+| **Drools** | Motor de reglas simbólicas alternativo. | Apache 2.0 |
+| **LanceDB / FAISS / SQLite-vec** | Base de datos vectorial para búsqueda semántica (memoria a largo plazo). | Apache 2.0 / MIT |
+| **Kubernetes / K3s** | Orquestación de contenedores para el despliegue de agentes. | Apache 2.0 |
+| **Istio** | Service mesh para la gestión del tráfico y seguridad mTLS. | Apache 2.0 |
+| **Kafka / NATS** | Sistema de mensajería para el bus de eventos del ecosistema. | Apache 2.0 / MIT |
+| **Prometheus / Grafana / Loki** | Monitorización, visualización y agregación de logs. | Apache 2.0 / AGPLv3 |
+| **Neo4j Community Edition** | Base de datos de grafos para el conocimiento semántico. | GPLv3 |
 
-#### 7.1.2 Estrategias de Razonamiento como Objetos de Primera Clase
+### 10.4 El estándar AOF-S y herramientas propias
 
-En el ASA, las estrategias de razonamiento no están hardcodeadas. Son objetos de primera clase almacenados en la memoria meta‑cognitiva con métricas de rendimiento:
+| Componente | Función | Licencia |
+| :--- | :--- | :--- |
+| **AOF-S** | Estándar de empaquetado y orquestación de agentes (este proyecto). | Apache 2.0 |
+| **noctl** | CLI para la gestión del ciclo de vida del Noosistema (en desarrollo). | Apache 2.0 |
+| **NooKepler** | Runtime de ejecución de agentes ASA (en desarrollo). | Apache 2.0 |
 
-| Estrategia | Descripción | Latencia típica | Mejor dominio |
-|------------|-------------|-----------------|---------------|
-| **Chain‑of‑Thought (CoT)** | Razonamiento paso a paso en lenguaje natural. | 3‑5 segundos | Generación de código, debugging, documentación. |
-| **Tree‑of‑Thoughts (ToT)** | Exploración de múltiples ramas de razonamiento, con poda y selección. | 10‑15 segundos | Planificación arquitectónica, coordinación multi‑agente, evaluación de riesgos. |
-| **Causal Simulation** | Simulación contrafactual con MCTS sobre el Grafo Causal Probabilístico. | 8‑12 segundos | Optimización de infraestructura, respuesta a incidentes, planificación de capacidad. |
 
-Cada estrategia registra:
-- **success_rate:** Proporción de hipótesis validadas vs. falsadas cuando se usó esta estrategia.
-- **avg_latency_ms:** Tiempo promedio de ejecución.
-- **domains:** Lista de dominios donde ha demostrado ser efectiva.
-- **last_used:** Timestamp del último uso.
+## 11. Modos de Operación del N3: Degradación Graciosa y Delegación Inteligente
 
-#### 7.1.3 Selección Dinámica de Estrategia
+### 11.1 Definición
 
-Durante la fase de Razonar (fase 2), el agente N3 consulta su memoria meta‑cognitiva y selecciona la estrategia más adecuada para la tarea actual:
+La **degradación graciosa** es la capacidad del N3 de omitir fases de su ciclo operativo o delegar tareas a agentes de menor nivel (N2/N1) cuando la complejidad de la tarea no justifica la ejecución del ciclo completo. Esta capacidad se deriva del principio de agencia progresiva y de la meta‑cognición del N3.
 
-1. **Identificar el dominio de la tarea** (ej: "infraestructura", "código", "planificación").
+### 11.2 Modos de Operación
 
-2. **Filtrar estrategias** que hayan demostrado efectividad en ese dominio.
+| Modo | Ciclo | Contexto de Uso |
+| :--- | :--- | :--- |
+| **N3 Completo** | 7 fases | Capa C5 (Orquestación). Tareas que requieren simulación contrafactual, verificación neuro‑simbólica o coordinación multi‑agente. |
+| **N3 Degradado** | 5 fases | Capa C3 (Edge). Tareas locales que no requieren razonamiento causal profundo ni verificación formal. |
+| **N3 Delegando** | 4 fases | Tareas rutinarias donde existe un N2 o N1 especializado disponible. El N3 actúa como enrutador inteligente. |
 
-3. **Seleccionar la de mayor success_rate**, ponderada por latencia (si la tarea es urgente, se penalizan las estrategias lentas).
+### 11.3 Principio de no orquestación para N2
 
-4. **Ejecutar el razonamiento** con la estrategia seleccionada.
+La capacidad de orquestación (coordinación de otros agentes, mantenimiento del `registry.yaml`, aplicación de políticas globales) es **exclusiva del N3**. Un agente N2 no puede asumir funciones de orquestación, ni siquiera en modo local. La orquestación local en edge (C3) debe ser asumida por un N3 que opere en modo degradado.
 
-5. **Registrar el rendimiento** en la memoria meta‑cognitiva tras la reflexión (fase 7).
+## 12. Gobernanza Algorítmica y Seguridad
 
-**Ejemplo:**
-```
-Agente N3, fase Razonar:
-  Tarea: "Optimizar la latencia del checkout en producción".
-  Dominio identificado: infrastructure_optimization.
-  
-  Consulta a memoria meta‑cognitiva:
-    - CoT: success_rate 0.87, domains: ["code_generation", "debugging"]
-    - Causal Simulation: success_rate 0.92, domains: ["infrastructure_optimization", "incident_response"]
-    - ToT: success_rate 0.78, domains: ["architectural_planning", "multi_agent_coordination"]
-  
-  Selección: Causal Simulation (mayor success_rate en el dominio, 0.92).
-  Decisión: "Usaré simulación causal para predecir los efectos de la intervención."
-```
+La gobernanza algorítmica es la capacidad del ecosistema de agentes para garantizar que cada acción autónoma sea trazable, auditable y conforme a las políticas declaradas. En el Modelo ASA, esta gobernanza no es una capa externa añadida a posteriori, sino un principio estructural integrado en el propio ciclo operativo.
 
-### 7.2 Razonamiento Neuro‑Simbólico Híbrido: La Fase Verificar
-
-#### 7.2.1 Fundamento Teórico
-
-Los LLM son potentes pero no deterministas. Pueden generar hipótesis creativas, pero también pueden alucinar, violar restricciones de seguridad o proponer acciones que incumplen contratos semánticos. El razonamiento neuro‑simbólico híbrido combina:
-
-- **Razonamiento neuronal (LLM):** Flexibilidad, creatividad, comprensión del lenguaje natural, capacidad de generalización.
-- **Razonamiento simbólico (Motor de reglas):** Determinismo, verificabilidad, cumplimiento estricto de políticas, trazabilidad.
-
-La fase Verificar (fase 4, exclusiva de N3) es la materialización de esta combinación: el LLM genera la hipótesis; el motor de reglas la valida antes de ejecutarla.
-
-#### 7.2.2 Componentes del Motor de Verificación
-
-El motor de verificación se apoya en tres fuentes de reglas:
-
-1. **Contratos semánticos (JSON Schema):** Declarados en `ASA.yaml` para cada capacidad del agente. Especifican el formato y las restricciones de las entradas y salidas.
-
-2. **Políticas de seguridad (OPA):** Declaradas en `Noosfile.yaml`. Definen qué acciones están permitidas para cada nivel de agencia y en qué condiciones.
-
-3. **Restricciones constitucionales:** Declaradas en `constitution.md`. Principios inviolables que el agente no puede transgredir bajo ninguna circunstancia.
-
-#### 7.2.3 Flujo de Verificación
-
-1. **Entrada:** La hipótesis generada por el LLM en la fase 3.
-
-2. **Validación de contratos semánticos:** El motor verifica que los parámetros de la acción propuesta cumplen los JSON Schema declarados en `ASA.yaml`. Por ejemplo: ¿el nombre de la base de datos cumple el patrón `^[a-z][a-z0-9_]*$`? ¿El tamaño está entre 1 y 1000 GB?
-
-3. **Validación de políticas de seguridad:** El motor consulta las políticas OPA declaradas en `Noosfile.yaml`. Por ejemplo: ¿el agente que propone la acción tiene nivel suficiente? ¿La acción está permitida para ese nivel?
-
-4. **Validación constitucional:** El motor verifica que la acción no viola ningún principio de `constitution.md`. Por ejemplo: ¿la intervención afecta a zonas críticas (UCI, quirófanos)? ¿Se compromete la autonomía de baterías para equipos de soporte vital?
-
-5. **Resultado:**
-   - **Autorizado:** La hipótesis pasa a la fase de Ejecutar (fase 5).
-   - **Rechazado:** La hipótesis se bloquea, se registra en el ledger de auditoría con el motivo del rechazo y se notifica al orquestador.
-
-#### 7.2.4 Ejemplo de Verificación
-
-```
-Agente N3 (hospital), fase Verificar:
-  Hipótesis H018: "Pre‑enfriar consultas externas (22→20°C) entre 13:00‑14:00."
-
-  Validación de contratos semánticos:
-    ✅ Zona "consultas_externas" existe en el modelo del mundo.
-    ✅ Temperatura objetivo (20°C) está dentro del rango permitido (18‑26°C).
-
-  Validación de políticas OPA:
-    ✅ Agente energy‑agent (N2) está autorizado para modificar HVAC.
-    ✅ La zona "consultas_externas" no es una zona crítica (UCI, quirófanos).
-
-  Validación constitucional:
-    ✅ No se compromete la autonomía de baterías (SOC mínimo garantizado).
-    ✅ Las temperaturas previstas cumplen la norma (máx 24°C transitorio).
-
-  Resultado: AUTORIZADO. Hipótesis H018 pasa a Ejecutar.
-```
-
-### 7.3 Sinergia entre Meta‑Cognición y Verificación Neuro‑Simbólica
-
-La combinación de meta‑cognición y verificación neuro‑simbólica crea un ciclo virtuoso en el N3:
-
-1. **La meta‑cognición** selecciona la mejor estrategia de razonamiento para la tarea.
-2. **El LLM** (razonamiento neuronal) genera una hipótesis creativa y contextualizada.
-3. **El motor de reglas** (razonamiento simbólico) verifica que la hipótesis cumple todas las políticas.
-4. **La reflexión** (fase 7) actualiza la memoria meta‑cognitiva con el rendimiento real de la estrategia utilizada.
-
-Este ciclo permite que el agente no solo aprenda sobre el mundo (a través del Grafo Causal y la memoria semántica), sino que **aprenda a aprender**: mejora sus propias estrategias de razonamiento con la experiencia.
-
-## 8. Gobernanza Algorítmica
-
-La gobernanza algorítmica es la capacidad del ecosistema de agentes para garantizar que cada acción autónoma sea trazable, auditable y conforme a las políticas declaradas. En el Modelo ASA, esta gobernanza no es una capa externa añadida a posteriori, sino un principio estructural integrado en el propio ciclo operativo. Constituye el Tejido T1 (Gobernanza Algorítmica en Tiempo de Ejecución) del Noosistema.
-
-### 8.1 Fundamento Teórico: Gobernanza por Diseño
+### 12.1 Fundamento Teórico: Gobernanza por Diseño
 
 La mayoría de los frameworks de agentes tratan la gobernanza como una preocupación secundaria: se desarrolla el agente y luego se añaden guardarraíles, logs o mecanismos de auditoría. ASA invierte este enfoque: la gobernanza está embebida en el ciclo de razonamiento desde la fase de Hipótesis hasta la fase de Reflexionar. Cada acción autónoma deja una traza completa que permite reconstruir:
 
@@ -682,17 +801,17 @@ La mayoría de los frameworks de agentes tratan la gobernanza como una preocupac
 - **Qué ocurrió realmente** (resultado observado).
 - **Qué se aprendió** (lecciones extraídas y cambios en el modelo).
 
-### 8.2 Los Tres Puntos de Control del Tejido T1
+### 12.2 Los Tres Puntos de Control
 
 El ciclo ASA implementa tres puntos de control que actúan como compuertas de verificación en tiempo de ejecución:
 
 | Punto de Control | Fase ASA | ¿Qué verifica? | ¿Quién lo ejecuta? |
-|------------------|----------|----------------|-------------------|
+|:---|:---|:---|:---|
 | **Puerta de pre‑acción** | Fase 3 (Hipótesis) / Fase 4 (Verificar) | ¿Tiene la acción una hipótesis registrada? ¿Cumple las políticas OPA? ¿Respeta los contratos semánticos? ¿Viola la constitución? | Motor neuro‑simbólico (N3) o validación declarativa (N2). |
 | **Monitor de tiempo de ejecución** | Fase 5 (Ejecutar) | ¿Está apareciendo un bucle de realimentación no previsto? ¿Se ha superado algún umbral de seguridad? | Watchdog de bucles (sidecar PEP en el runtime NooKepler). |
 | **Auditor post‑acción** | Fase 6 (Evaluar) / Fase 7 (Reflexionar) | ¿El resultado real coincide con la hipótesis? ¿Hay anomalías no predichas? ¿Se han actualizado el modelo y las memorias? | El propio agente (N2/N3) o la memoria colectiva (para N1). |
 
-### 8.3 Trazabilidad Completa: El Ledger de Auditoría
+### 12.3 Trazabilidad Completa: El Ledger de Auditoría
 
 Cada decisión autónoma queda registrada en un ledger de auditoría inmutable. Este ledger no es un simple archivo de logs: es un registro estructurado que vincula cada acción con su hipótesis, su verificación y su resultado.
 
@@ -718,7 +837,7 @@ Cada decisión autónoma queda registrada en un ledger de auditoría inmutable. 
   hypothesis_result: "validated"
 ```
 
-### 8.4 Alineación con OWASP Top 10 para Aplicaciones Agénticas (2026)
+### 12.4 Alineación con OWASP Top 10 para Aplicaciones Agénticas (2026)
 
 El Modelo ASA incorpora mitigaciones específicas para los diez riesgos catalogados por OWASP:
 
@@ -735,7 +854,7 @@ El Modelo ASA incorpora mitigaciones específicas para los diez riesgos cataloga
 | **Bucle de Consumo Descontrolado** | Watchdog de bucles en la fase Ejecutar. Límites de tokens por sesión. Compresión autónoma. |
 | **Ingeniería Social sobre el Agente** | Constitución (`constitution.md`) con principios inviolables. Aprobación humana para acciones críticas. |
 
-### 8.5 Alineación con NIST AI RMF 1.0
+### 12.5 Alineación con NIST AI RMF 1.0
 
 El ciclo ASA implementa los cuatro pilares del marco de gestión de riesgos de IA del NIST:
 
@@ -746,17 +865,11 @@ El ciclo ASA implementa los cuatro pilares del marco de gestión de riesgos de I
 | **Manage (Gestionar)** | Las políticas procedurales (`policies.yaml`), las políticas OPA declarativas y los guardarraíles (Tejido T1) gestionan activamente los riesgos en tiempo de ejecución. |
 | **Govern (Gobernar)** | La constitución (`constitution.md`), el `Noosfile` y el ledger de auditoría proporcionan un marco de gobernanza trazable y auditable. |
 
-## 9. Principio Local‑First
+## 13. Principio Local First
 
-El Principio 0 del Modelo ASA establece que la ejecución local es el camino predeterminado para todo agente. La nube se degrada explícitamente a un respaldo opcional, configurable bajo demanda. Este principio responde a tres tendencias irreversibles del ecosistema de agentes en 2026: la demanda de soberanía de datos, la eliminación de costes por token y la necesidad de operación offline en entornos edge o aislados.
+El Principio 0 del Modelo ASA establece que la ejecución local es el camino predeterminado para todo agente. La nube se degrada explícitamente a un respaldo opcional, configurable bajo demanda.
 
-### 9.1 Fundamento Teórico
-
-Proyectos como el Enterprise Local‑First Gateway (ELG, 35.4k estrellas), el Cognitive Loop Kernel (CLK) y Qualixar OS han demostrado que la ejecución local de agentes no solo es viable, sino que es preferible para una amplia clase de aplicaciones. La industria ha resuelto los desafíos de inferencia local mediante motores como Ollama (simplicidad), llama.cpp (portabilidad extrema) y vLLM (alto rendimiento bajo carga concurrente).
-
-ASA formaliza esta tendencia en su arquitectura: cada nivel de agencia se asocia a configuraciones hardware concretas, y el agente declara sus motores de inferencia en su manifiesto de identidad (`ASA.yaml`). Esto permite que un mismo agente opere en una Raspberry Pi (N1), una GPU de consumo (N2) o un clúster empresarial (N3), sin cambiar su estructura AOF‑S.
-
-### 9.2 Asociación de Niveles a Configuraciones Hardware
+### 13.1 Asociación de Niveles a Configuraciones Hardware
 
 | Nivel | Hardware Recomendado | VRAM/RAM | Motores de Inferencia | Modelos de Ejemplo |
 |-------|---------------------|----------|----------------------|-------------------|
@@ -764,93 +877,33 @@ ASA formaliza esta tendencia en su arquitectura: cada nivel de agencia se asocia
 | **N2 (Sistémico)** | GPU 8‑12 GB VRAM, Apple Silicon 16‑32 GB | 8‑12 GB VRAM | Ollama, llama.cpp | Llama 3.1 8B, Qwen 2.5 14B |
 | **N3 (Orquestado)** | GPU 18 GB+ VRAM, DGX Spark, Clúster | 18‑80 GB VRAM | Ollama, llama.cpp, vLLM | Llama 3.1 70B, Qwen 2.5 32B |
 
-### 9.3 Configuración Declarativa
+### 13.2 Configuración Declarativa
 
-La sección `inference` en `ASA.yaml` permite declarar los motores locales, los modelos asignados y las restricciones de recursos:
+La sección `inference` en `ASA.yaml` permite declarar los motores locales, los modelos asignados y las restricciones de recursos.
 
-```yaml
-inference:
-  mode: "local_first"
-  local_engines:
-    - name: "ollama"
-      models: ["llama3.2:3b", "qwen2.5-coder:7b"]
-      priority: 1
-    - name: "llama.cpp"
-      models: ["llama3.1-8b-Q4_K_M.gguf"]
-      priority: 2
-  resource_limits:
-    max_vram_gb: 8
-    fallback_to_cloud: false
-```
+---
 
-### 9.4 Política de Fallback a la Nube
+## 14. Relación con AOF S y el Noosistema
 
-Aunque la ejecución local es el camino predeterminado, el ASA permite configurar un fallback a la nube para escenarios específicos:
+El Modelo ASA no existe en el vacío. Es el pilar central de un ecosistema más amplio compuesto por tres elementos interdependientes: el **Noosistema** (el ecosistema donde los agentes colaboran), **ASA** (la arquitectura del agente) y **AOF‑S** (el estándar de archivos que materializa ASA).
 
-- **Por saturación de recursos locales:** Si la VRAM o la CPU locales están al límite, el agente puede enrutar consultas a modelos cloud.
-- **Por complejidad de la tarea:** Si una tarea requiere un modelo frontera (ej: GPT‑4, Claude Opus) que no está disponible localmente.
-- **Por indisponibilidad del motor local:** Si Ollama o llama.cpp están caídos por mantenimiento.
-
-El fallback se configura estableciendo `fallback_to_cloud: true` y especificando los proveedores cloud autorizados y las condiciones de activación.
-
-### 9.5 Beneficios del Principio Local‑First
-
-| Beneficio | Descripción |
-|-----------|-------------|
-| **Soberanía de datos** | El contexto sensible (memoria, corpus experto, hipótesis) nunca abandona el hardware del usuario. 0% de datos exfiltrados en modo local‑only. |
-| **Cero costes por token** | En modo local, la ejecución no genera facturación alguna. Crítico para agentes autónomos de larga duración. |
-| **Operación offline** | Los agentes pueden funcionar sin conexión a internet, esencial para edge computing, entornos hospitalarios o infraestructuras críticas aisladas. |
-| **Privacidad por defecto** | El cumplimiento normativo (HIPAA, PCI DSS, GDPR) se simplifica al no transmitir datos a terceros. |
-| **Independencia de proveedores** | El usuario decide qué motor de inferencia usa y si quiere activar el respaldo cloud. Sin vendor lock‑in. |
-| **Alineación con la industria** | Adopción de los mismos principios que ELG, CLK, SuperLocalMemory y Qualixar OS. |
-
-### 9.6 Implicación para el Ciclo ASA
-
-La elección del motor de inferencia se integra en la fase de Razonar (fase 2). El agente consulta su configuración `inference`, evalúa los recursos disponibles y selecciona el motor y el modelo más adecuados para la tarea. Esta selección es transparente para el resto del ciclo: el agente formula hipótesis, verifica, ejecuta y reflexiona independientemente del motor que haya utilizado para razonar.
-
-## 10. Relación con AOF‑S y el Noosistema
-
-El Modelo ASA no existe en el vacío. Es el pilar central de un ecosistema más amplio compuesto por tres elementos interdependientes: el **Noosistema** (el ecosistema donde los agentes colaboran), **ASA** (la arquitectura del agente) y **AOF‑S** (el estándar de archivos que materializa ASA). Esta sección explica cómo se relacionan estos tres pilares y por qué cada uno es necesario para que los otros dos funcionen.
-
-### 10.1 El Triángulo del Noosistema
-
-```
-            ┌────────────────────────────────┐
-            │         NOOSISTEMA             │
-            │  (Ecosistema cognitivo digital)│
-            │  • Define el escenario         │
-            │  • Orquestación adaptativa     │
-            │  • Memoria colectiva           │
-            │  • Cierre de ciclo diferencial │
-            └──────────────────┬─────────────┘
-                               │
-                 ┌─────────────┴─────────────┐
-                 ▼                           ▼
-     ┌───────────────────────┐   ┌────────────────────────┐
-     │         ASA           │   │        AOF‑S           │
-     │  (Arquitectura del    │   │  (Estándar de archivos)│
-     │   agente)             │   │  • Materializa ASA     │
-     │  • Cómo razona        │   │  • Define la estructura│
-     │  • Cómo recuerda      │   │  • Noosfile + noctl    │
-     │  • Cómo aprende       │   │  • Carga progresiva    │
-     └───────────────────────┘   └────────────────────────┘
-```
+### 14.1 El Triángulo del Noosistema
 
 | Pilar | ¿Qué es? | ¿Qué problema resuelve? |
 |-------|----------|------------------------|
-| **Noosistema** | El ecosistema cognitivo digital estratificado donde los agentes ASA colaboran bajo orquestación adaptativa. | Define el escenario: los agentes no trabajan aislados, sino en una red estratificada con memoria colectiva, cierre de ciclo diferencial y gobernanza compartida. |
-| **ASA** | La arquitectura del Agente Sistémico Adaptativo. Define cómo un agente razona, recuerda y aprende. | Resuelve la amnesia, la falta de modelo causal y la ausencia de niveles de agencia progresiva. |
+| **Noosistema** | El ecosistema cognitivo digital estratificado. | Define el escenario: los agentes no trabajan aislados, sino en una red estratificada con memoria colectiva, cierre de ciclo diferencial y gobernanza compartida. |
+| **ASA** | La arquitectura del Agente Sistémico Adaptativo. | Resuelve la amnesia, la falta de modelo causal y la ausencia de niveles de agencia progresiva. |
 | **AOF‑S** | El estándar abierto de archivos que materializa ASA en el Noosistema. | Resuelve la fragmentación: un formato versionable, abierto y portable que cualquier LLM puede leer y escribir. |
 
-### 10.2 Cómo ASA se Materializa en AOF‑S
+### 14.2 Cómo ASA se Materializa en AOF‑S
 
-AOF‑S es la implementación de referencia del Modelo ASA. Cada concepto de ASA tiene su correspondencia directa en un artefacto AOF‑S:
+Cada concepto de ASA tiene su correspondencia directa en un artefacto AOF‑S:
 
 | Concepto ASA | Materialización en AOF‑S |
 |--------------|--------------------------|
-| **Principio de Intervención Reflexiva Causal** | Ciclo de 7 fases documentado en `spec/asa.yaml`. El agente lee y escribe `hypothesis.md`, `observations/` y `policies.yaml` como parte de su ciclo. |
-| **Tres niveles de agencia** | Plantillas `templates/reactive/`, `templates/systemic/`, `templates/orchestrated/`. Cada plantilla contiene los artefactos correspondientes a su nivel. |
-| **Ciclo ASA de 7 fases** | Matriz de carga progresiva en `spec/aof-s.yaml`. Cada fase carga un subconjunto específico de artefactos. |
+| **Principio de Intervención Reflexiva Causal** | Ciclo de 7 fases documentado en `spec/asa.yaml`. El agente lee y escribe `hypothesis.md`, `observations/` y `policies.yaml`. |
+| **Tres niveles de agencia** | Plantillas `templates/reactive/`, `templates/systemic/`, `templates/orchestrated/`. |
+| **Ciclo ASA de 7 fases** | Matriz de carga progresiva en `spec/aof-s.yaml`. Cada fase carga un subconjunto de artefactos. |
 | **Memoria cuádruple** | Directorios `06_memory/episodic/`, `06_memory/semantic/`, `06_memory/procedural/` y archivo `meta_strategies.yaml`. |
 | **Grafo Causal Probabilístico** | Archivo `04_knowledge/world_model/causal_graph.proto`. |
 | **Verificación neuro‑simbólica** | Fase Verificar documentada en `spec/asa.yaml` y motor de reglas CLIPS/Drools configurado en `ASA.yaml`. |
@@ -859,65 +912,42 @@ AOF‑S es la implementación de referencia del Modelo ASA. Cada concepto de ASA
 | **Gobernanza algorítmica** | `hypothesis.md` (puerta pre‑acción), watchdog de bucles (monitor de ejecución), `observations/` y ledger (auditor post‑acción). |
 | **Evaluabilidad** | Sección `evaluation` en `ASA.yaml` y `03_agent_spec.yaml`. Comando `noctl evaluate`. |
 
-### 10.3 Cómo ASA Habita el Noosistema
+## 15. Limitaciones y Hoja de Ruta
 
-El Noosistema proporciona el contexto ecosistémico donde los agentes ASA operan:
+ASA es una arquitectura ambiciosa y, como tal, presenta limitaciones que deben ser reconocidas explícitamente. Esta sección las enumera junto con las mitigaciones actuales y los planes para resolverlas.
 
-- **Memoria colectiva:** Los agentes N1 no aprenden localmente, pero sus evaluaciones alimentan una memoria colectiva que los agentes N2 y N3 consultan durante sus fases de reflexión. Esto permite un aprendizaje evolutivo a nivel de todo el ecosistema.
+### 15.1 Limitaciones reconocidas
 
-- **Cierre de ciclo diferencial:** El Noosistema define tres tipos de cierre de ciclo:
-  - **N1 (Sistémico):** El agente no cierra el ciclo localmente, pero sus evaluaciones persisten en la memoria colectiva.
-  - **N2 (Local):** El agente actualiza su propio estado (memoria, modelo causal).
-  - **N3 (Local + Sistémico):** Además del cierre local, el agente puede reescribir reglas globales del ecosistema.
+| Limitación | Descripción | Mitigación actual | Plan de resolución |
+|:---|:---|:---|:---|
+| **Complejidad computacional del N3** | El ciclo de 7 fases añade latencia (especialmente Verificar y Reflexionar). En edge o tareas simples, el overhead puede ser >500ms. | N1 y N2 para edge y tareas simples. Modo degradado del N3 (5 fases). | Implementar degradación graciosa automática basada en meta‑cognición. |
+| **Curva de aprendizaje alta** | ASA requiere comprender artefactos `.aof`, motores simbólicos, bases vectoriales y memoria cuádruple. | Modo ultra‑light (2 archivos, 5 minutos). Documentación extensa y guías paso a paso. | Tutoriales interactivos, plantillas sectoriales pre‑configuradas. |
+| **Dependencia de un modelo causal inicial** | El grafo causal requiere definición previa de relaciones P(Y do(X)). En dominios nuevos, el grafo estará vacío o erróneo. | El N2 construye el grafo incrementalmente desde la experiencia. | Herramientas de bootstrap causal desde datos históricos. |
+| **Consumo de memoria y almacenamiento** | La memoria cuádruple crece linealmente con el tiempo de operación. En edge o IoT, la huella puede ser prohibitiva. | N1 no persiste nada. N2 persiste solo lo esencial. Compresión autónoma de contexto. | Implementar `noctl memory compact` para consolidación periódica. |
+| **Falta de implementación de referencia** | ASA existe como especificación y plantillas, pero no hay un runtime funcional que valide las hipótesis arquitectónicas. | Plantillas AOF‑S utilizables con cualquier LLM. CLI `noctl` en desarrollo. | NooKepler (runtime Rust) y runtime Python de referencia. |
+| **Ecosistema inmaduro** | No hay foros, tutoriales extensivos ni comunidad activa. La integración con motores simbólicos (CLIPS/Drools) no está estandarizada. | Repositorio público, documentación extensa, ejemplos sectoriales. | Benchmarks comparativos, workshop en conferencias, propuesta de estandarización en Linux Foundation. |
+| **Orquestación multiagente no validada** | La NSL y la federación de agentes no tienen una implementación funcional que demuestre su viabilidad en entornos reales. | Especificación detallada de NSL, A2A y MCP. | Pilotos sectoriales (Hospital, Datacenter) como validación empírica. |
 
-- **Orquestación adaptativa:** Los agentes N3 coordinan a los N2 y N1 mediante los protocolos A2A, MCP y NSL. El `registry.yaml` actúa como el tejido conectivo del ecosistema, manteniendo el mapa vivo de agentes, capacidades y trust scores.
+### 15.2 Hoja de Ruta
 
-- **Configurabilidad sectorial:** El Noosistema se adapta a diferentes sectores (hospitales, puertos, centros de datos) sin modificar la arquitectura ASA ni el estándar AOF‑S. Solo se cambian las skills, el corpus experto y el `Noosfile`.
+| Horizonte | Hito | Estado |
+|:---|:---|:---|
+| **Corto plazo** | Implementación de referencia en Python del ciclo ASA. | Pendiente |
+| **Corto plazo** | Benchmarks comparativos ASA vs. ReAct vs. Plan‑and‑Execute. | Pendiente |
+| **Medio plazo** | Runtime NooKepler en Rust con soporte nativo para degradación graciosa. | Pendiente |
+| **Medio plazo** | Pilotos sectoriales (Hospital, Datacenter). | Pendiente |
+| **Largo plazo** | Estandarización bajo Linux Foundation (AAIF) o CNCF. | Pendiente |
 
-### 10.4 El Flujo Completo
+## Conclusión
 
-1. **El Noosistema** define el ecosistema donde los agentes colaboran (memoria colectiva, registro de agentes, gobernanza compartida).
-
-2. **Cada agente ASA** opera dentro de ese ecosistema siguiendo el ciclo de 7 fases: arranca cargando su contexto AOF‑S, razona con la estrategia más adecuada, formula hipótesis causales, las verifica (si es N3), ejecuta monitorizado, evalúa los resultados y reflexiona para actualizar su modelo del mundo y sus memorias.
-
-3. **Los artefactos AOF‑S** son el "lenguaje común" que los agentes leen y escriben. Son versionables, auditables y portables. Cualquier LLM que entienda Markdown + YAML puede operar como un agente ASA.
-
-4. **El runtime NooKepler** (en desarrollo) actuará como el harness que ejecuta el ciclo ASA, gestiona la carga progresiva de contexto y proporciona el entorno de ejecución seguro (sandboxing, watchdog, ledger de auditoría).
-
----
-
-## Conclusión del Documento Conceptual
-
-El Modelo ASA representa una evolución fundamental en la arquitectura de agentes de IA. Frente a los paradigmas reactivos dominantes (ReAct, Plan‑and‑Solve), ASA introduce:
-
-1. **Intervención reflexiva causal:** Toda acción es una hipótesis que se verifica, se evalúa y se contrasta con la realidad.
-
-2. **Tres niveles de agencia progresiva:** Desde agentes reactivos sin memoria (N1) hasta orquestadores con meta‑cognición y razonamiento neuro‑simbólico (N3).
-
-3. **Memoria cuádruple:** Episódica, semántica, procedural y meta‑cognitiva, con mecanismos de olvido y fortalecimiento inspirados en la psicología cognitiva.
-
-4. **Grafo Causal Probabilístico:** Modelado de P(Y|do(X)) con distribuciones de probabilidad actualizables por reflexión.
-
-5. **Meta‑cognición y razonamiento neuro‑simbólico híbrido:** El agente aprende a razonar mejor, seleccionando dinámicamente la estrategia más adecuada y verificando sus hipótesis contra políticas formales.
-
-6. **Gobernanza algorítmica por diseño:** Tres puntos de control (pre‑acción, ejecución, post‑acción) que garantizan trazabilidad y cumplimiento.
-
-7. **Principio Local‑First:** Ejecución local por defecto, nube como respaldo opcional. Soberanía de datos, cero costes por token y operación offline.
+El Modelo ASA representa una evolución fundamental en la arquitectura de agentes de IA. Frente a los paradigmas reactivos dominantes (ReAct, Plan‑and‑Solve), ASA introduce la intervención reflexiva causal, tres niveles de agencia progresiva, memoria cuádruple con meta‑cognición, un Grafo Causal Probabilístico actualizable, gobernanza algorítmica por diseño y un principio Local‑First que garantiza la soberanía de datos.
 
 ASA no es una propuesta teórica: está materializado en el estándar abierto AOF‑S, que proporciona plantillas listas para usar, una CLI de orquestación (`noctl`) y una pila de protocolos (A2A, MCP, NSL) que lo integran con el ecosistema de agentes existente.
 
-El viaje continúa. El runtime NooKepler, los pilotos sectoriales y la estandarización bajo la Linux Foundation son los próximos hitos. Pero la arquitectura está lista. El Noosistema está listo. Los agentes ASA están listos para aprender, razonar y colaborar.
-
----
-**Autores:** Jorge Y. Hernández García (ETKinnova), DeepSeek (DeepThink) como asistente de diseño sistémico.  
-**Parte del estándar:** AOF‑S v1.0  
-**Ubicación:** `docs/concept/asa-conceptual.md` en el repositorio público.
 ---
 
-**Referencias**
-
-[1] H. von Foerster, *Cybernetics of Cybernetics*. Univ. of Illinois, 1974.  
-[2] J. W. Forrester, *Industrial Dynamics*. MIT Press, 1961.  
-[3] D. H. Meadows, *Thinking in Systems: A Primer*. Chelsea Green, 2008.  
-[4] J. R. Anderson et al., "An Integrated Theory of the Mind," *Psychological Review*, vol. 111, no. 4, pp. 1036–1060, 2004.  
-[5] J. Pearl, *Causality: Models, Reasoning, and Inference*. Cambridge Univ. Press, 2009.
+**Versión:** 2.0
+**Fecha:** 13 de junio de 2026
+**Autores:** Jorge Y. Hernández García (ETKinnova), DeepSeek (DeepThink) como asistente de diseño sistémico.
+**Parte del estándar:** AOF‑S v1.0
+```
