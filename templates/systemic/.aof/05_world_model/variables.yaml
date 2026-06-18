@@ -1,0 +1,26 @@
+# variables.yaml — Variables observables del sistema (Nivel 2: Sistémico)
+#
+# El agente mantiene un modelo del mundo con las variables
+# que monitoriza. Esto es parte del Gemelo Digital (Tejido T3).
+
+sector: "e-commerce"
+last_updated: "2026-06-07T10:00:00Z"
+
+variables:
+  - name: db_query_latency_p95
+    value: 150
+    unit: ms
+    source: "prometheus:db_query_latency_p95"
+    refresh_interval: "1m"
+
+  - name: db_cpu_usage
+    value: 65
+    unit: percent
+    source: "prometheus:db_cpu_usage"
+    refresh_interval: "1m"
+
+  - name: active_connections
+    value: 120
+    unit: count
+    source: "prometheus:db_active_connections"
+    refresh_interval: "30s"

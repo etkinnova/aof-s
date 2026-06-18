@@ -1,0 +1,90 @@
+# policies.yaml — Políticas procedurales del orquestador (Nivel 3: Orquestado)
+#
+# El agente orquestador refina estas políticas en cada ciclo de reflexión.
+# Son reglas de producción (Sistema 1) que automatizan respuestas ante
+# situaciones recurrentes, reduciendo la necesidad de razonamiento pesado.
+# Incluye trazabilidad para la Gobernanza Algorítmica (Tejido T1).
+
+policies:
+  # ── Rendimiento y Base de Datos ──
+  - name: "check_index_on_latency"
+    condition: "db_query_latency_p95 > 500ms"
+    action: "revisar si falta índice en la tabla principal consultada"
+    confidence: 0.95
+    source: "H000-2026-06-07 (validated)"
+    last_updated: "2026-06-07T09:15:00Z"
+
+  - name: "validate_migration_in_staging"
+    condition: "action_type == 'database_migration' AND target == 'production'"
+    action: "ejecutar migración en staging y validar métricas durante 15 minutos antes de promover"
+    confidence: 0.99
+    source: "constitution.md"
+    last_updated: "2026-06-01T00:00:00Z"
+
+  - name: "avoid_hot_index_on_large_tables"
+    condition: "action_type == 'create_index' AND table_rows > 10000000"
+    action: "validar en staging con volumen de datos similar antes de producción; considerar crear índice CONCURRENTLY"
+    confidence: 0.93
+    source: "H002-2026-04-01 (validated); H007-2026-04-15 (validated)"
+    last_updated: "2026-04-15T16:00:00Z"
+
+  # ── Despliegue ──
+  - name: "no_friday_deploys"
+    condition: "action_type == 'production_deployment' AND day_of_week IN ('friday', 'saturday')"
+    action: "posponer despliegue al próximo lunes; notificar al solicitante"
+    confidence: 0.97
+    source: "H001-2026-03-15 (validated); reinforced by multiple episodes"
+    last_updated: "2026-03-15T10:00:00Z"
+
+  - name: "verify_staging_before_production"
+    condition: "action_target == 'production'"
+    action: "ejecutar paso previo en staging y validar métricas durante 15 minutos"
+    confidence: 0.99
+    source: "constitution.md"
+    last_updated: "2026-06-01T00:00:00Z"
+
+  # ── Seguridad ──
+  - name: "log_all_actions_for_audit"
+    condition: "always"
+    action: "registrar acción, hipótesis asociada y resultado en audit_log antes de finalizar"
+    confidence: 1.0
+    source: "constitution.md (Gobernanza Algorítmica T1)"
+    last_updated: "2026-06-01T00:00:00Z"
+
+  - name: "verify_identity_before_collaboration"
+    condition: "action_type == 'inter_agent_collaboration'"
+    action: "verificar identidad SPIFFE del agente destino; rechazar si no está en registry.yaml"
+    confidence: 1.0
+    source: "constitution.md (Zero Trust T2)"
+    last_updated: "2026-06-01T00:00:00Z"
+
+  # ── Ecosistema ──
+  - name: "isolate_degraded_agent"
+    condition: "agent.trust_score < 0.70 AND agent.status != 'degraded'"
+    action: "marcar agente como 'degraded'; pausar enrutamiento de tareas hacia él; notificar al orquestador"
+    confidence: 0.96
+    source: "H018-2026-06-02 (validated)"
+    last_updated: "2026-06-02T10:00:00Z"
+
+  - name: "circuit_breaker_on_repeated_failures"
+    condition: "agent.failure_count >= 3 AND agent.failure_window < '5m'"
+    action: "pausar invocaciones al agente durante 60s; notificar al orquestador; registrar en anomaly_notes.md"
+    confidence: 0.98
+    source: "global_policies.circuit_breaker (Noosfile)"
+    last_updated: "2026-06-01T00:00:00Z"
+
+  # ── Compresión autónoma de contexto ──
+  - name: "compress_context_on_long_session"
+    condition: "session_tokens > 50000"
+    action: "consolidar historial en bloque de conocimiento semántico y liberar contexto; ejecutar noctl memory compact"
+    confidence: 0.85
+    source: "built-in (v1.0)"
+    last_updated: "2026-06-07T00:00:00Z"
+
+  # ── Meta‑cognición ──
+  - name: "select_best_reasoning_strategy"
+    condition: "task_domain IN ('infrastructure_optimization', 'incident_response')"
+    action: "usar causal_simulation como estrategia de razonamiento (success_rate: 0.92, avg_latency: 8.2s)"
+    confidence: 0.92
+    source: "meta_cognitive/meta_strategies.yaml"
+    last_updated: "2026-06-07T09:30:00Z"

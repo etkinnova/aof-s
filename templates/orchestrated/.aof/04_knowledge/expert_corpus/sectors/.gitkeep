@@ -1,0 +1,3 @@
+# .gitkeep — Sectors
+# Directorio para configuraciones sectoriales (hospital, datacenter, etc.).
+# Cada sector tiene su propio subdirectorio con skills y corpus específicos.

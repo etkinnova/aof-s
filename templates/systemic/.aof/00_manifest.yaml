@@ -1,0 +1,11 @@
+# 00_manifest.yaml — AOF‑S v1.0 Manifest (Nivel 2: Sistémico)
+#
+# Metadatos del agente. Identifica el estándar, el nivel y el proyecto.
+# Personaliza los campos según tu proyecto.
+
+framework: AOF‑S v1.0
+level: 2                                   # 2 = Sistémico
+name: "db-optimizer"
+project: "mi-api"
+created: "2026-06-07"
+agent_instance: "agent-002"

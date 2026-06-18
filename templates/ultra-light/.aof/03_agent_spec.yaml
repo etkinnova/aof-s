@@ -1,0 +1,21 @@
+# 03_agent_spec.yaml — Especificación del agente (Nivel 2: Sistémico)
+#
+# Define el rol, el modelo LLM, las herramientas permitidas,
+# las restricciones operativas y la evaluación del agente.
+
+role: "Database Performance Engineer"
+model: "claude-sonnet-4-20250514"
+allowed_tools:
+  - read_file
+  - write_to_file
+  - execute_command
+  - query_database
+constraints:
+  max_parallel_actions: 3
+
+# Evaluación (recomendada en N2)
+evaluation:
+  metrics:
+    - hypothesis_precision
+    - falsification_rate
+    - avg_execution_time_sec

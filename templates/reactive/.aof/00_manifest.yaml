@@ -1,0 +1,11 @@
+# 00_manifest.yaml — AOF‑S v1.0 Manifest (Nivel 1: Reactivo)
+#
+# Metadatos del agente. Identifica el estándar, el nivel y el proyecto.
+# Personaliza los campos según tu proyecto.
+
+framework: AOF‑S v1.0
+level: 1                                   # 1 = Reactivo
+name: "mi-agente"
+project: "mi-api"
+created: "2026-06-07"
+agent_instance: "agent-001"

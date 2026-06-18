@@ -1,0 +1,36 @@
+# 02_mission.yaml — Misión del ecosistema (Nivel 3: Orquestado)
+#
+# Define la misión estratégica del sub‑Noosistema, las restricciones
+# globales y las métricas de éxito. El orquestador (N3) utiliza esta
+# misión para coordinar a los agentes especialistas (N2) y reactivos (N1).
+
+mission: "Garantizar la experiencia de compra óptima en el flujo de checkout, manteniendo SLOs globales, optimizando costes y asegurando el cumplimiento PCI DSS, mediante la coordinación de agentes especialistas y la mejora continua del ecosistema."
+
+constraints:
+  - "No degradar la tasa de conversión por debajo del 99% de la línea base en ventanas de 7 días."
+  - "No violar PCI DSS v4.0 en ninguna intervención sobre el flujo de pago."
+  - "Todo cambio en producción requiere hipótesis registrada y validación en staging durante al menos 15 minutos."
+  - "La creación de nuevos agentes requiere autorización explícita del operador humano."
+  - "No exceder el presupuesto mensual de infraestructura en más de un 10% sin aprobación."
+
+success_metrics:
+  - metric: "checkout_p95_latency"
+    target: "< 500ms"
+    window: "7d"
+  - metric: "ecosystem_uptime"
+    target: "99.95%"
+    window: "30d"
+  - metric: "conversion_rate"
+    target: ">= baseline * 0.99"
+    window: "7d"
+  - metric: "mean_time_to_resolution"
+    target: "< 15min"
+    window: "30d"
+  - metric: "hypothesis_validation_rate"
+    target: "> 85%"
+    window: "90d"
+  - metric: "token_efficiency_ratio"
+    target: "> 70% de ahorro respecto a baseline sin carga progresiva"
+    window: "30d"
+
+sector: "e-commerce"

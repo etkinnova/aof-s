@@ -1,0 +1,13 @@
+# 00_manifest.yaml — AOF‑S v1.0 Ultra‑Light Manifest
+# 
+# Este archivo declara la identidad mínima del agente.
+# Es uno de los dos únicos archivos necesarios para el modo ultra‑light.
+# 
+# Personaliza los campos según tu proyecto.
+
+framework: AOF‑S v1.0
+level: 1                                   # 1 = Reactivo (ultra‑light)
+name: "mi-agente"
+project: "mi-proyecto"
+created: "2026-06-07"
+agent_instance: "agent-001"

@@ -1,0 +1,78 @@
+// causal_graph.proto — Probabilistic Causal Graph (Nivel 3: Orquestado)
+//
+// Este archivo define el Grafo Causal Probabilístico del ecosistema.
+// Modela P(Y | do(X)): la probabilidad de Y dado que intervengo sobre X.
+// El agente orquestador actualiza estas distribuciones en cada ciclo de reflexión.
+//
+// Este es un ejemplo para un ecosistema de e-commerce.
+
+syntax = "proto3";
+
+package aofs.world_model;
+
+// ── Grafo Causal del Ecosistema de E-Commerce ──
+// Ejemplo concreto para el dominio de checkout.
+message CausalGraph {
+  string domain = 1;                         // "ecommerce-checkout"
+  string version = 2;                        // "1.0.0"
+  string last_updated = 3;                   // "2026-06-07T10:00:00Z"
+  repeated CausalNode nodes = 4;
+  repeated CausalEdge edges = 5;
+  map<string, ProbabilityDistribution> distributions = 6;
+  double model_confidence = 7;               // 0.89
+}
+
+// ── Nodos del Ecosistema ──
+message CausalNode {
+  string id = 1;                             // Identificador único
+  string name = 2;                           // Nombre legible
+  NodeType type = 3;                         // Tipo de variable
+  string unit = 4;                           // Unidad de medida
+  double current_value = 5;                  // Valor actual
+  string gemelo_digital_ref = 6;             // Referencia al Gemelo Digital (T3)
+  string description = 7;                    // Descripción
+  repeated string tags = 8;                  // Etiquetas para búsqueda
+}
+
+enum NodeType {
+  OBSERVABLE = 0;                            // Medible directamente
+  CONTROLLABLE = 1;                          // Intervenible por el agente
+  LATENT = 2;                                // No observable directamente
+  OBJECTIVE = 3;                             // Variable objetivo a optimizar
+}
+
+// ── Aristas Causales ──
+message CausalEdge {
+  string id = 1;                             // Identificador único
+  string from = 2;                           // Nodo causa
+  string to = 3;                             // Nodo efecto
+  EdgeType type = 4;                         // Tipo de arista
+  string delay_distribution = 5;             // Referencia a delays.yaml
+  string description = 6;                    // Descripción
+  int32 effect_order = 7;                    // Orden del efecto (1º, 2º, 3º)
+}
+
+enum EdgeType {
+  DIRECT = 0;                                // Relación causal directa
+  REINFORCING_LOOP = 1;                      // Parte de un bucle de refuerzo
+  BALANCING_LOOP = 2;                        // Parte de un bucle de equilibrio
+}
+
+// ── Distribuciones de Probabilidad ──
+message ProbabilityDistribution {
+  string edge_id = 1;                        // Arista a la que pertenece
+  DistributionType type = 2;                 // Tipo de distribución
+  repeated double parameters = 3;            // Parámetros (dependen del tipo)
+  double confidence = 4;                     // Confianza del agente (0-1)
+  string last_updated = 5;                   // ISO 8601
+  string evidence_source = 6;                // Hipótesis o episodio que la actualizó
+  int32 sample_size = 7;                     // Número de observaciones
+}
+
+enum DistributionType {
+  GAUSSIAN = 0;                              // N(mu, sigma)
+  BETA = 1;                                  // Beta(alpha, beta)
+  EMPIRICAL = 2;                             // Distribución empírica
+  POISSON = 3;                               // Poisson(lambda)
+  UNIFORM = 4;                               // Uniform(min, max)
+}

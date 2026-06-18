@@ -1,0 +1,5 @@
+# .gitkeep — Memoria Episódica
+# Directorio para el registro cronológico de intervenciones.
+# Cada episodio es un archivo Markdown con timestamp, hipótesis
+# asociada, acción tomada y resultado observado.
+# Formato de nombre: YYYY-MM-DD_NN_descripcion.md
