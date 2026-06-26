@@ -1,0 +1,7 @@
+# 03_mission.yaml — Misión del agente
+# Rango 03 — Misión.
+mission: "[Define la misión del agente]"
+constraints:
+- "[Restricción 1]"
+success_metrics:
+- "[Métrica 1]"

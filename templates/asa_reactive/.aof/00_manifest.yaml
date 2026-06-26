@@ -1,0 +1,9 @@
+# 00_manifest.yaml — AOF‑S v1.0 Manifest
+# Rango 00 — Identidad.
+framework: AOF‑S v1.0
+level: 1
+name: "mi-agente"
+project: "mi-agente"
+created: "2026-06-20"
+agent_instance: "agent-1802"
+active_skills: []

@@ -65,31 +65,36 @@ spec:
       name: Progressive Agency
       description: >
         Complexity is activated only at the level that requires it. Agents 
-        start simple (N1 ultra-light with 2 files) and scale to full 
+        start simple (N1 ultra-light with 3 files) and scale to full 
         autonomous swarms (N3) through declarative upgrades.
 
   # ── Levels ──
   levels:
+    - level: "1-ultra-light"
+      name: Reactive (Ultra‑Light)
+      directory: ".aof/"
+      artifacts:
+        - "00_manifest.yaml"
+        - "01_context_static.md"
+        - "02_agent_spec.yaml"
+      ultra_light:
+        enabled: true
+        description: >
+          Minimal agent with 3 files. Start in 5 minutes. Remaining artifacts 
+          are generated on demand when upgrading to level 1 or 2.
+
     - level: 1
       name: Reactive
       directory: ".aof/"
       artifacts:
         - "00_manifest.yaml"
         - "01_context_static.md"
-        - "02_mission.yaml"
-        - "03_agent_spec.yaml"
+        - "02_agent_spec.yaml"
+        - "03_mission.yaml"
         - "04_tasks/current_plan.md"
-        - "05_skills/"
-        - "06_validation_spec.md"
-        - "07_observations.log"
-      ultra_light:
-        enabled: true
-        artifacts:
-          - "00_manifest.yaml"
-          - "01_context_static.md"
-        description: >
-          Minimal agent with 2 files. Start in 5 minutes. Remaining artifacts 
-          are generated on demand when upgrading to level 2.
+        - "05_skills/testing_skill.md"
+        - "08_validation_spec.md"
+        - "09_observations.log"
 
     - level: 2
       name: Systemic
@@ -97,13 +102,13 @@ spec:
       artifacts:
         - "00_manifest.yaml"
         - "01_context_static.md"
-        - "02_mission.yaml"
-        - "03_agent_spec.yaml"
+        - "02_agent_spec.yaml"
+        - "03_mission.yaml"
         - "04_tasks/hypothesis.md"
         - "04_tasks/steps.md"
-        - "05_world_model/variables.yaml"
-        - "05_world_model/state.md"
-        - "06_skills/"
+        - "05_skills/diagnostic_skill.md"
+        - "06_world_model/variables.yaml"
+        - "06_world_model/state.md"
         - "07_memory/episodic/"
         - "07_memory/procedural/policies.yaml"
         - "08_validation_spec.md"
@@ -116,36 +121,36 @@ spec:
       name: Orchestrated
       directory: ".aof/"
       artifacts:
-        - "ASA.yaml"
         - "00_manifest.yaml"
         - "01_context_static.md"
-        - "02_mission.yaml"
-        - "03_agent_spec.yaml"
-        - "04_knowledge/world_model/variables.yaml"
-        - "04_knowledge/world_model/causal_graph.proto"
-        - "04_knowledge/world_model/delays.yaml"
-        - "04_knowledge/world_model/state.md"
-        - "04_knowledge/expert_corpus/vector_store/"
-        - "04_knowledge/expert_corpus/source_documents/"
-        - "04_knowledge/expert_corpus/sectors/"
-        - "04_knowledge/registry.yaml"
-        - "04_knowledge/hypotheses/active/"
-        - "04_knowledge/hypotheses/validated/"
-        - "04_knowledge/hypotheses/falsified/"
-        - "04_knowledge/tasks/current_steps.md"
+        - "02_agent_spec.yaml"
+        - "03_mission.yaml"
+        - "04_hypotheses/active/"
+        - "04_hypotheses/validated/"
+        - "04_hypotheses/falsified/"
         - "05_skills/causal_mapping_skill.md"
         - "05_skills/simulation_skill.md"
         - "05_skills/rag_skill.md"
         - "05_skills/deployment_skill.md"
-        - "06_memory/episodic/"
-        - "06_memory/semantic/learned_rules.yaml"
-        - "06_memory/semantic/domain_facts.md"
-        - "06_memory/procedural/policies.yaml"
-        - "07_validation_spec.md"
-        - "08_observations/feedback_log.yaml"
-        - "08_observations/anomaly_notes.md"
-        - "09_values/constitution.md"
-        - "09_values/user_preferences.yaml"
+        - "06_knowledge/world_model/variables.yaml"
+        - "06_knowledge/world_model/causal_graph.proto"
+        - "06_knowledge/world_model/delays.yaml"
+        - "06_knowledge/world_model/state.md"
+        - "06_knowledge/expert_corpus/vector_store/"
+        - "06_knowledge/expert_corpus/source_documents/"
+        - "06_knowledge/expert_corpus/sectors/"
+        - "06_knowledge/registry.yaml"
+        - "06_knowledge/tasks/current_steps.md"
+        - "07_memory/episodic/"
+        - "07_memory/semantic/learned_rules.yaml"
+        - "07_memory/semantic/domain_facts.md"
+        - "07_memory/procedural/policies.yaml"
+        - "08_validation_spec.md"
+        - "09_observations/feedback_log.yaml"
+        - "09_observations/anomaly_notes.md"
+        - "10_values/constitution.md"
+        - "10_values/user_preferences.yaml"
+        - "11_ASA.yaml"
 
   # ── Progressive Context Loading Matrix ──
   context_loading:
@@ -154,7 +159,7 @@ spec:
       minimizing token consumption without sacrificing analytical depth.
     phases:
       - phase: startup
-        artifacts: [manifest, context_static, mission, agent_spec, state, constitution]
+        artifacts: [manifest, context_static, agent_spec, mission, state, constitution]
         tokens_approx: "2-5k"
       - phase: reason
         artifacts: [episodic (top-N), policies, variables]
@@ -245,7 +250,7 @@ spec:
       - llama.cpp
       - vLLM
     fallback: "cloud (optional, configurable)"
-    configuration: "ASA.yaml (inference section)"
+    configuration: "02_agent_spec.yaml (inference section)"
 
   # ── Evaluation ──
   evaluation:

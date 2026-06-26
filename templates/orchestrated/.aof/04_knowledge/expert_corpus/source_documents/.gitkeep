@@ -1,3 +1,0 @@
-# .gitkeep — Source Documents
-# Directorio para los documentos fuente del corpus experto (PDFs, MDs, APIs).
-# El RAG nativo indexa estos documentos en la base de datos vectorial.

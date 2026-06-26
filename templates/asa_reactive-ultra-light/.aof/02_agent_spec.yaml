@@ -1,0 +1,18 @@
+# 02_agent_spec.yaml — Especificación del Agente ASA (Obligatorio según ADR‑011)
+# Rango 02 — Especificación del agente.
+role: "[Define el rol del agente]"
+model: "llama3.2:latest"
+allowed_tools:
+- read_file
+- write_to_file
+- execute_command
+constraints:
+max_parallel_actions: 3
+timeout_per_request_ms: 5000
+inference:
+endpoint: "http://localhost:11434/api/generate"
+model: "llama3.2:latest"
+evaluation:
+metrics:
+- task_success_rate
+- avg_execution_time_sec

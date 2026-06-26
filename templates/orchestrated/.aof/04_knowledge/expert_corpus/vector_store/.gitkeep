@@ -1,3 +1,0 @@
-# .gitkeep — Vector Store
-# Directorio para la base de datos vectorial local (LanceDB/FAISS).
-# Los embeddings de los documentos del corpus experto se almacenan aquí.

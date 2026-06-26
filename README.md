@@ -78,6 +78,7 @@ aof-s/
 │   ├── why.md               # Por qué existe AOF‑S
 │   ├── how.md               # Cómo usarlo
 │   └── guides/              # Guías detalladas
+│   └── concept/             # Documentos Conceptuales
 └── templates/               # Plantillas listas para usar
     ├── ultra-light/         # Nivel 1 reducido (2 archivos)
     ├── reactive/            # Nivel 1 completo
