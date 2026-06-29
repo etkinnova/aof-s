@@ -69,11 +69,7 @@ aof-s/
 ├── README.md                # Este archivo
 ├── LICENSE                  # Apache 2.0
 ├── spec/                    # Especificación ejecutable (verdad única)
-│   ├── asa.yaml             # Modelo de agencia (tres niveles)
 │   ├── aof-s.yaml           # Estándar de archivos
-│   ├── noosfile.yaml        # Manifiesto de orquestación
-│   ├── nsl.yaml             # Capa Semántica Noosistémica
-│   └── causal_graph.proto   # Grafo Causal Probabilístico
 ├── docs/                    # Documentación para humanos
 │   ├── why.md               # Por qué existe AOF‑S
 │   ├── how.md               # Cómo usarlo
@@ -129,7 +125,6 @@ AOF‑S se integra con los estándares abiertos del ecosistema de agentes:
 | [`docs/why.md`](docs/why.md) | La filosofía detrás de AOF‑S |
 | [`docs/how.md`](docs/how.md) | Guía práctica de adopción |
 | [`spec/aof-s.yaml`](spec/aof-s.yaml) | Especificación formal del estándar |
-| [`spec/asa.yaml`](spec/asa.yaml) | Modelo de agencia ASA |
 | [`docs/concept/aofs-conceptual_es.md`](docs/concept/aofs-conceptual_es.md) | Diseño conceptual AOF‑S|
 
 ---
