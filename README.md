@@ -47,7 +47,7 @@ AOF‑S implementa la arquitectura ASA en tres niveles progresivos:
 ## 🚀 Empieza en 5 minutos
 
 ```bash
-# 1. Inicializa un agente reactivo (solo 2 archivos)
+# 1. Inicializa un agente reactivo (solo 3 archivos)
 noctl init --level 1 --ultra-light
 
 # 2. Personaliza tu contexto

@@ -1,0 +1,370 @@
+apiVersion: aof-s/v1
+kind: Standard
+metadata:
+  name: AI Orchestration Files for Systemic Agents
+  version: "1.2"
+  description: >
+    Open standard for versionable AI orchestration files that materialize 
+    the cognitive artifacts of the ASA (Adaptive Systemic Agent) architecture.
+    Defines how agents are packaged, governed, and orchestrated in a 
+    Local-First ecosystem. This specification defines only the file format 
+    and conventions; runtimes (such as ASA Agent) interpret the artifacts.
+spec:
+  implements: "ASA v2.0"
+  ecosystem: "Noosystem"
+
+  # ── Principles (8 principles, 0-7) ──
+  principles:
+    - id: 0
+      name: Local-First by Design
+      description: >
+        Local execution is the default path. AOF‑S artifacts reside on the 
+        local file system. The cloud is an optional, explicitly configured 
+        fallback.
+    - id: 1
+      name: Cognitive Separation
+      description: >
+        Each artifact answers a precise cognitive question: identity, mission, 
+        context, world model, memory, observations, or values.
+    - id: 2
+      name: Progressive Context Loading
+      description: >
+        The agent loads only the artifacts relevant to the current phase of 
+        the ASA cycle, keeping token usage between 2k and 12k tokens.
+    - id: 3
+      name: Reflexive Causal Intervention
+      description: >
+        Every action requires a registered hypothesis with predicted effects 
+        of 1st, 2nd, and 3rd order. Results are compared and the world model 
+        updated.
+    - id: 4
+      name: Purposeful Cognitive Memory
+      description: >
+        Memory organized into episodic, semantic, procedural, and (N3) 
+        meta-cognitive types, with mathematical mechanisms for forgetting, 
+        strengthening, and consolidation.
+    - id: 5
+      name: Zero Trust Security by Construction
+      description: >
+        SPIFFE identities, mTLS, and OPA policies integrated from the design 
+        phase. Security is progressive by agency level.
+    - id: 6
+      name: Integrated Evaluability
+      description: >
+        Every agent declares evaluation metrics and benchmarks. Evaluation is 
+        a first-class lifecycle command.
+    - id: 7
+      name: Progressive Agency
+      description: >
+        Complexity is activated only when needed. Agents scale from N1 
+        (3 files) to N3 (30+ files) through declarative upgrades.
+
+  # ── Levels ──
+  levels:
+    - level: 1
+      name: Reactive
+      directory: ".aof/"
+      artifacts:
+        - "00_manifest.yaml"
+        - "01_context_static.md"
+        - "02_agent_spec.yaml"
+        - "03_mission.yaml"
+        - "04_tasks/current_plan.md"
+        - "05_skills/testing_skill.md"
+        - "08_validation_spec.md"
+        - "09_observations.log"
+      modes:
+        ultra_light:
+          artifacts: ["00_manifest.yaml", "01_context_static.md", "02_agent_spec.yaml"]
+          description: "Minimal configuration for edge devices (ESP32, RPi). No LLM required."
+
+    - level: 2
+      name: Systemic
+      directory: ".aof/"
+      artifacts:
+        - "00_manifest.yaml"
+        - "01_context_static.md"
+        - "02_agent_spec.yaml"
+        - "03_mission.yaml"
+        - "04_tasks/hypothesis.md"
+        - "04_tasks/steps.md"
+        - "05_skills/diagnostic_skill.md"
+        - "06_world_model/variables.yaml"
+        - "06_world_model/state.md"
+        - "07_memory/episodic/"
+        - "07_memory/procedural/policies.yaml"
+        - "08_validation_spec.md"
+        - "09_observations/feedback.yaml"
+        - "09_observations/anomalies.md"
+        - "10_values/constitution.md"
+        - "10_values/preferences.yaml"
+
+    - level: 3
+      name: Orchestrated
+      directory: ".aof/"
+      artifacts:
+        - "00_manifest.yaml"
+        - "01_context_static.md"
+        - "02_agent_spec.yaml"
+        - "03_mission.yaml"
+        - "04_hypotheses/active/"
+        - "04_hypotheses/validated/"
+        - "04_hypotheses/falsified/"
+        - "05_skills/causal_mapping_skill.md"
+        - "05_skills/simulation_skill.md"
+        - "05_skills/rag_skill.md"
+        - "05_skills/deployment_skill.md"
+        - "06_knowledge/world_model/variables.yaml"
+        - "06_knowledge/world_model/causal_graph.proto"
+        - "06_knowledge/world_model/delays.yaml"
+        - "06_knowledge/world_model/state.md"
+        - "06_knowledge/expert_corpus/vector_store/"
+        - "06_knowledge/expert_corpus/source_documents/"
+        - "06_knowledge/expert_corpus/sectors/"
+        - "06_knowledge/registry.yaml"
+        - "06_knowledge/tasks/current_steps.md"
+        - "07_memory/episodic/"
+        - "07_memory/semantic/learned_rules.yaml"
+        - "07_memory/semantic/domain_facts.md"
+        - "07_memory/procedural/policies.yaml"
+        - "08_validation_spec.md"
+        - "09_observations/feedback_log.yaml"
+        - "09_observations/anomaly_notes.md"
+        - "10_values/constitution.md"
+        - "10_values/user_preferences.yaml"
+        - "11_ASA.yaml"
+      modes:
+        complete:
+          phases: 7
+          description: "Full cycle with simulation, verification, and orchestration."
+        degraded:
+          phases: 5
+          description: "Edge operation without causal simulation or symbolic verification."
+        delegating:
+          phases: 4
+          description: "Routes tasks to N2/N1 specialists without local execution."
+
+  # ── Progressive Context Loading ──
+  context_loading:
+    phases:
+      - phase: startup
+        artifacts: [manifest, context_static, agent_spec, mission, state, constitution]
+        tokens_approx: "2-5k"
+      - phase: reason
+        artifacts: [episodic (top-N), policies, variables]
+        tokens_approx: "+2-3k"
+      - phase: hypothesize
+        artifacts: [causal_graph, delays, expert_corpus (RAG), simulation_skill]
+        tokens_approx: "+3-5k"
+      - phase: verify
+        artifacts: [verification_rules, semantic_contracts, security_policies]
+        tokens_approx: "+1-2k (N3 only)"
+      - phase: execute
+        artifacts: [current_steps, specific_skills]
+        tokens_approx: "variable"
+      - phase: evaluate
+        artifacts: [feedback_log, anomaly_notes]
+        tokens_approx: "+1k"
+      - phase: reflect
+        artifacts: [hypothesis, semantic_rules, policies, meta_cognitive (N3)]
+        tokens_approx: "+2-3k"
+
+  # ── Evidence Gate ──
+  evidence_gate:
+    description: >
+      If total_errors == 0 after evaluation, the agent skips hypothesis and 
+      reflection phases, reducing token consumption in normal operation.
+    implemented_in: "ASA Agent runtime (N2/N3)"
+    scope: [N2, N3]
+
+  # ── Manifest (Noosfile) ──
+  manifest:
+    name: "Noosfile"
+    file: "noosfile.yaml"
+    api_version: "noos.cncf.io/v1alpha2"
+    sections:
+      - agents
+      - security
+      - shared_services
+      - global_policies
+      - evaluation
+      - inference
+    agent_fields:
+      active_skills:
+        description: "Optional list of skill filenames (from 05_skills/) active for this agent."
+        type: "list of strings"
+        default: "all skills in directory"
+      metadata:
+        description: "Optional free-form key-value pairs for project/instance identification."
+        type: "map"
+
+  # ── Deployment Profiles ──
+  deployment_profiles:
+    standalone:
+      description: "Single agent on a local device. No network dependencies."
+      required_components: [".aof/", "binario N1/N2"]
+      latency_target: "<100ms"
+      privacy: "maximum"
+      scalability: "1 agent"
+      offline_resilience: "total"
+    edge:
+      description: "Multiple agents on local network with lightweight messaging."
+      required_components: [".aof/", "NATS", "LanceDB/SQLite (optional)"]
+      latency_target: "<100ms"
+      privacy: "high"
+      scalability: "10-50 agents"
+      offline_resilience: "high"
+    enterprise:
+      description: "Full ecosystem with Kubernetes, service mesh, and Zero Trust security."
+      required_components: [".aof/", "Kubernetes", "Istio", "SPIRE", "OPA", "Kafka"]
+      latency_target: "<500ms"
+      privacy: "medium (depends on architecture)"
+      scalability: "100s of agents"
+      offline_resilience: "low (cloud-dependent)"
+
+  # ── CLI ──
+  cli:
+    name: "noctl"
+    commands:
+      - init
+      - apply
+      - upgrade
+      - status
+      - get
+      - describe
+      - evaluate
+      - security
+      - diagnose
+      - memory compact
+      - inference route
+
+  # ── Protocol Integration ──
+  protocols:
+    transport: "SLIM (AGNTCY)"
+    syntactic:
+      a2a:
+        description: "Agent-to-Agent communication for discovery and task delegation."
+        usage: "Agent Cards derived from 02_agent_spec.yaml"
+      mcp:
+        description: "Model Context Protocol for tool integration."
+        usage: "Skills declare MCP servers; tools can be local or MCP-based"
+    semantic:
+      description: >
+        Semantic alignment uses A2A Agent Cards with Versioned Capability 
+        Vectors (VCVs) and optional ontology bindings. No separate semantic 
+        protocol is required; NSL conventions travel as metadata over A2A/MCP.
+      vcv:
+        description: "Versioned Capability Vectors enable semantic agent discovery."
+        format: "capability:v1, capability:v2"
+        stored_in: "registry.yaml"
+
+  # ── Skills ──
+  skills:
+    format: "agentskills.io compatible"
+    description: >
+      Skills are Markdown files with a YAML frontmatter block. Tools can be 
+      MCP servers, native runtime actions, or standard function definitions 
+      (OpenAI/Anthropic tool calling format). The LLM mode field controls 
+      when the agent consults the LLM.
+      For executing local scripts, use the built-in MCP server 
+      'local-command-server' (recommended) to keep skills portable.
+    llm_modes:
+      never: "Deterministic execution; no LLM call."
+      always: "LLM consulted before every execution."
+      on_error: "LLM consulted only if previous cycle had errors."
+      on_change: "LLM consulted when mission, context, or endpoints change."
+    tool_types:
+      mcp_server:
+        description: "Tool provided by a Model Context Protocol server."
+        fields:
+          name: "MCP server name"
+          command: "Optional launch command"
+          args: "Optional arguments"
+      native:
+        description: "Tool built into the runtime (e.g., deploy_agent, http_request)."
+        fields:
+          action: "Native action identifier"
+      function:
+        description: "Tool defined using JSON Schema, compatible with OpenAI/Anthropic tool calling."
+        fields:
+          parameters: "JSON Schema for the tool's input"
+    example:
+      name: "health_check"
+      version: "1.0.0"
+      tools:
+        - name: "http_health"
+          description: "Check HTTP endpoint health"
+          mcp_server:
+            name: "monitoring-tools"
+          function:
+            parameters:
+              type: object
+              properties:
+                url:
+                  type: string
+              required: ["url"]
+          defaults:
+            method: "GET"
+            timeout_ms: 5000
+      llm:
+        mode: "on_error"
+
+  # ── Agent Spec ──
+  agent_spec:
+    description: "Additional fields allowed in 02_agent_spec.yaml beyond role and VCVs."
+    optional_fields:
+      allowed_tools:
+        description: "List of tool names this agent is permitted to use."
+      constraints:
+        description: "Operational limits (max_parallel_actions, timeout_per_request_ms, etc.)."
+
+  # ── Security ──
+  security:
+    identity: "SPIFFE"
+    transport: "mTLS"
+    policies: "OPA (declared in Noosfile)"
+    defense: "Bayesian Trust Defense against memory poisoning"
+    compliance:
+      - "OWASP Top 10 for Agentic Applications (2026)"
+      - "NIST AI RMF 1.0"
+    progressive:
+      level_1: "OS sandbox (gVisor). No SPIFFE/OPA required."
+      level_2: "Auto-configured mTLS. OPA optional with default policies."
+      level_3: "SPIFFE, mTLS, and OPA mandatory."
+
+  # ── Inference (Local-First) ──
+  inference:
+    mode: "local_first"
+    engines:
+      - ollama
+      - llama.cpp
+      - vLLM
+    fallback: "cloud (optional, configurable via triggers)"
+    configuration: "02_agent_spec.yaml (inference section)"
+
+  # ── Evaluation ──
+  evaluation:
+    metrics:
+      - hypothesis_precision
+      - falsification_rate
+      - p95_latency_ms
+      - avg_tokens_per_intervention
+      - task_success_rate
+    benchmark_suites:
+      - "MCP-AgentBench"
+    commands:
+      - "noctl evaluate agent <name>"
+      - "noctl evaluate ecosystem"
+
+  # ── Sectors ──
+  sectors:
+    supported:
+      - hospital
+      - datacenter
+      - port
+      - manufacturing
+      - campus
+      - airport
+    description: >
+      The Noosystem adapts to different sectors by changing only the agent 
+      library and the expert_corpus. Base architecture remains unchanged.
