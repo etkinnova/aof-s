@@ -2,7 +2,7 @@ apiVersion: aof-s/v1
 kind: Standard
 metadata:
   name: AI Orchestration Files for Systemic Agents
-  version: "1.2"
+  version: "1.3"
   description: >
     Open standard for versionable AI orchestration files that materialize 
     the cognitive artifacts of the ASA (Adaptive Systemic Agent) architecture.
@@ -70,7 +70,7 @@ spec:
         - "02_agent_spec.yaml"
         - "03_mission.yaml"
         - "04_tasks/current_plan.md"
-        - "05_skills/testing_skill.md"
+        - "05_skills/"
         - "08_validation_spec.md"
         - "09_observations.log"
       modes:
@@ -88,7 +88,7 @@ spec:
         - "03_mission.yaml"
         - "04_tasks/hypothesis.md"
         - "04_tasks/steps.md"
-        - "05_skills/diagnostic_skill.md"
+        - "05_skills/"
         - "06_world_model/variables.yaml"
         - "06_world_model/state.md"
         - "07_memory/episodic/"
@@ -110,10 +110,7 @@ spec:
         - "04_hypotheses/active/"
         - "04_hypotheses/validated/"
         - "04_hypotheses/falsified/"
-        - "05_skills/causal_mapping_skill.md"
-        - "05_skills/simulation_skill.md"
-        - "05_skills/rag_skill.md"
-        - "05_skills/deployment_skill.md"
+        - "05_skills/"
         - "06_knowledge/world_model/variables.yaml"
         - "06_knowledge/world_model/causal_graph.proto"
         - "06_knowledge/world_model/delays.yaml"
@@ -191,12 +188,16 @@ spec:
       - inference
     agent_fields:
       active_skills:
-        description: "Optional list of skill filenames (from 05_skills/) active for this agent."
+        description: "Optional list of skill names active for this agent."
         type: "list of strings"
-        default: "all skills in directory"
+        default: "all skills in 05_skills/"
       metadata:
         description: "Optional free-form key-value pairs for project/instance identification."
         type: "map"
+      profile:
+        description: "Deployment profile this agent instance runs on."
+        type: "string"
+        enum: ["standalone", "edge", "enterprise"]
 
   # ── Deployment Profiles ──
   deployment_profiles:
@@ -235,8 +236,9 @@ spec:
       - evaluate
       - security
       - diagnose
-      - memory compact
-      - inference route
+      - "memory compact"
+      - "inference route"
+      - validate
 
   # ── Protocol Integration ──
   protocols:
@@ -245,6 +247,7 @@ spec:
       a2a:
         description: "Agent-to-Agent communication for discovery and task delegation."
         usage: "Agent Cards derived from 02_agent_spec.yaml"
+        configuration: "11_ASA.yaml (communication section)"
       mcp:
         description: "Model Context Protocol for tool integration."
         usage: "Skills declare MCP servers; tools can be local or MCP-based"
@@ -258,16 +261,33 @@ spec:
         format: "capability:v1, capability:v2"
         stored_in: "registry.yaml"
 
+  # ── Registry ──
+  registry:
+    description: "Agent registry maintained by the N3 orchestrator."
+    file: "06_knowledge/registry.yaml"
+    fields:
+      - name
+      - level
+      - status
+      - identity (SPIFFE)
+      - trust_score
+      - vcv (Versioned Capability Vectors)
+      - capabilities (A2A endpoints)
+      - heartbeat_interval
+      - endpoint
+
   # ── Skills ──
   skills:
-    format: "agentskills.io compatible"
+    format: "agentskills.io compatible (subdirectory per skill)"
     description: >
-      Skills are Markdown files with a YAML frontmatter block. Tools can be 
-      MCP servers, native runtime actions, or standard function definitions 
-      (OpenAI/Anthropic tool calling format). The LLM mode field controls 
-      when the agent consults the LLM.
-      For executing local scripts, use the built-in MCP server 
-      'local-command-server' (recommended) to keep skills portable.
+      Each skill is a subdirectory inside 05_skills/ containing a SKILL.md 
+      file with YAML frontmatter and Markdown instructions. Optional 
+      subdirectories: scripts/, references/, assets/.
+    structure:
+      SKILL.md: "YAML frontmatter + Markdown body (mandatory)"
+      scripts/: "executable code (optional)"
+      references/: "reference docs (optional)"
+      assets/: "templates and resources (optional)"
     llm_modes:
       never: "Deterministic execution; no LLM call."
       always: "LLM consulted before every execution."
@@ -281,9 +301,13 @@ spec:
           command: "Optional launch command"
           args: "Optional arguments"
       native:
-        description: "Tool built into the runtime (e.g., deploy_agent, http_request)."
+        description: "Tool built into the runtime."
         fields:
           action: "Native action identifier"
+        known_actions:
+          - deploy_agent
+          - generate_workspace
+          - validate_aof
       function:
         description: "Tool defined using JSON Schema, compatible with OpenAI/Anthropic tool calling."
         fields:
@@ -317,12 +341,35 @@ spec:
         description: "List of tool names this agent is permitted to use."
       constraints:
         description: "Operational limits (max_parallel_actions, timeout_per_request_ms, etc.)."
+      security_overrides:
+        description: "Per-agent OPA policy overrides (if different from global Noosfile policies)."
+      communication:
+        description: "Agent-level A2A communication settings (channels, timeouts, retries)."
+
+  # ── 11_ASA.yaml ──
+  identity_communication:
+    description: "N3-only artifact declaring noosystemic identity and communication settings."
+    file: "11_ASA.yaml"
+    sections:
+      identity:
+        spiffe_id: "SPIFFE identity"
+        trust_domain: "Trust domain"
+      communication:
+        protocol: "A2A"
+        channels:
+          - type: "request_response"
+            endpoint: "/a2a/execute"
+            timeout_sec: 30
+            retries: 3
+          - type: "event_stream"
+            endpoint: "/a2a/events"
+            subscription: true
 
   # ── Security ──
   security:
     identity: "SPIFFE"
     transport: "mTLS"
-    policies: "OPA (declared in Noosfile)"
+    policies: "OPA (declared in Noosfile or per-agent in 02_agent_spec.yaml)"
     defense: "Bayesian Trust Defense against memory poisoning"
     compliance:
       - "OWASP Top 10 for Agentic Applications (2026)"
@@ -355,6 +402,120 @@ spec:
     commands:
       - "noctl evaluate agent <name>"
       - "noctl evaluate ecosystem"
+
+  # ── Templates ──
+  templates:
+    description: >
+      Content templates for each artifact. The N3 uses these to generate 
+      agent configurations from structured plans (JSON output of the LLM).
+      Placeholders use {{ double braces }} syntax.
+    level_1:
+      00_manifest.yaml: |
+        framework: AOF‑S v1.3
+        level: 1
+        name: "{{ agent_name }}"
+        project: "{{ project_name }}"
+        created: "{{ creation_date }}"
+        agent_instance: "{{ instance_id }}"
+        profile: "{{ profile }}"
+        active_skills:
+          {{ #each active_skills }}
+          - "{{ this }}"
+          {{ /each }}
+      02_agent_spec.yaml: |
+        role: "{{ role }}"
+        model: "{{ model }}"
+        allowed_tools:
+          {{ #each allowed_tools }}
+          - "{{ this }}"
+          {{ /each }}
+        constraints:
+          max_parallel_actions: {{ max_parallel_actions }}
+          timeout_per_request_ms: {{ timeout_per_request_ms }}
+        evaluation:
+          metrics:
+            - task_success_rate
+      03_mission.yaml: |
+        mission:
+          description: "{{ mission_description }}"
+          success_criteria:
+            {{ #each success_criteria }}
+            - "{{ this }}"
+            {{ /each }}
+      05_skills/{{ skill_name }}/SKILL.md: |
+        ---
+        name: {{ skill_name }}
+        description: "{{ skill_description }}"
+        version: "1.0.0"
+        tools:
+          {{ #each tools }}
+          - name: "{{ this.name }}"
+            {{ #if this.mcp_server }}
+            mcp_server:
+              name: "{{ this.mcp_server }}"
+            {{ /if }}
+            {{ #if this.native }}
+            native:
+              action: "{{ this.native }}"
+            {{ /if }}
+            function:
+              parameters: {{ this.parameters_json }}
+            defaults: {{ this.defaults_json }}
+          {{ /each }}
+        llm:
+          mode: "{{ llm_mode }}"
+        ---
+        # Skill: {{ skill_name }}
+        {{ skill_body }}
+    level_2:
+      extends: "level_1"
+      additional_artifacts:
+        06_world_model/variables.yaml: |
+          variables:
+            {{ #each variables }}
+            - name: "{{ this.name }}"
+              type: "{{ this.type }}"
+              initial_value: {{ this.initial_value }}
+            {{ /each }}
+        10_values/constitution.md: |
+          # Constitution
+          {{ constitution_body }}
+    level_3:
+      extends: "level_2"
+      additional_artifacts:
+        06_knowledge/registry.yaml: |
+          agents:
+            {{ #each agents }}
+            - name: "{{ this.name }}"
+              level: {{ this.level }}
+              status: "active"
+              identity: "{{ this.identity }}"
+              trust_score: 1.0
+              vcv:
+                {{ #each this.vcv }}
+                - "{{ this }}"
+                {{ /each }}
+              capabilities:
+                {{ #each this.capabilities }}
+                - name: "{{ this.name }}"
+                  endpoint: "{{ this.endpoint }}"
+                {{ /each }}
+              heartbeat_interval: {{ this.heartbeat_interval }}
+            {{ /each }}
+        11_ASA.yaml: |
+          identity:
+            spiffe_id: "{{ spiffe_id }}"
+            trust_domain: "{{ trust_domain }}"
+          communication:
+            protocol: "A2A"
+            channels:
+              - type: "request_response"
+                endpoint: "{{ a2a_endpoint }}"
+                timeout_sec: {{ a2a_timeout }}
+                retries: {{ a2a_retries }}
+              - type: "event_stream"
+                endpoint: "{{ a2a_events_endpoint }}"
+                subscription: true
 
   # ── Sectors ──
   sectors:
