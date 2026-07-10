@@ -2,7 +2,8 @@ apiVersion: aof-s/v1
 kind: Standard
 metadata:
   name: AI Orchestration Files for Systemic Agents
-  version: "1.3"
+  version: "1.4"
+  compatible_versions: ["1.2", "1.3"]
   description: >
     Open standard for versionable AI orchestration files that materialize 
     the cognitive artifacts of the ASA (Adaptive Systemic Agent) architecture.
@@ -10,7 +11,7 @@ metadata:
     Local-First ecosystem. This specification defines only the file format 
     and conventions; runtimes (such as ASA Agent) interpret the artifacts.
 spec:
-  implements: "ASA v2.0"
+  implements: "ASA v1.4"
   ecosystem: "Noosystem"
 
   # ── Principles (8 principles, 0-7) ──
@@ -59,11 +60,29 @@ spec:
         Complexity is activated only when needed. Agents scale from N1 
         (3 files) to N3 (30+ files) through declarative upgrades.
 
+  # ── Ecosystem Paths ──
+  ecosystem:
+    central_directory:
+      description: >
+        Central directory for the Noosystem ecosystem, shared by all agents 
+        on the same machine. Contains specifications, secrets, reusable 
+        packages, and community skill repositories.
+      default_path: "~/.noosystem"
+      env_variable: "NOOSYSTEM_PATH"
+      structure:
+        specs: "YAML specification files (aof-s.yaml, asa.yaml, noosystem.yaml)"
+        secrets: "Encrypted secrets (Age/SOPS)"
+        packages: "Reusable AOF Packages (skills, knowledge)"
+        repos: "Community skill repositories"
+
   # ── Levels ──
   levels:
     - level: 1
       name: Reactive
       directory: ".aof/"
+      requires:
+        - "00_manifest.yaml"
+        - "02_agent_spec.yaml"
       artifacts:
         - "00_manifest.yaml"
         - "01_context_static.md"
@@ -81,6 +100,10 @@ spec:
     - level: 2
       name: Systemic
       directory: ".aof/"
+      requires:
+        - "00_manifest.yaml"
+        - "02_agent_spec.yaml"
+        - "07_memory/"
       artifacts:
         - "00_manifest.yaml"
         - "01_context_static.md"
@@ -102,6 +125,11 @@ spec:
     - level: 3
       name: Orchestrated
       directory: ".aof/"
+      requires:
+        - "00_manifest.yaml"
+        - "02_agent_spec.yaml"
+        - "07_memory/"
+        - "06_knowledge/registry.yaml"
       artifacts:
         - "00_manifest.yaml"
         - "01_context_static.md"
@@ -198,6 +226,13 @@ spec:
         description: "Deployment profile this agent instance runs on."
         type: "string"
         enum: ["standalone", "edge", "enterprise"]
+      imports:
+        description: "Optional list of AOF Packages to incorporate into this agent."
+        type: "list"
+        items:
+          path: "Path to the package directory"
+          include: "List of ranges to import (e.g., ['05_skills', '06_world_model'])"
+          conflict_policy: "merge | override | skip (default: merge)"
 
   # ── Deployment Profiles ──
   deployment_profiles:
@@ -222,6 +257,24 @@ spec:
       privacy: "medium (depends on architecture)"
       scalability: "100s of agents"
       offline_resilience: "low (cloud-dependent)"
+
+  # ── Secrets Management ──
+  secrets:
+    description: >
+      Secrets (API keys, tokens, credentials) must never be stored in plain 
+      text within .aof/ artifacts. Use references of the form ${env:VAR} or 
+      ${secret:path}. Resolution is delegated to the runtime according to the 
+      deployment profile. Secrets are stored in the central directory 
+      (~/.noosystem/secrets/ or $NOOSYSTEM_PATH/secrets/).
+    syntax:
+      env: "${env:VARIABLE_NAME}"
+      secret: "${secret:path/to/secret}"
+    resolution:
+      standalone: "Environment variables or .env file"
+      edge: "Encrypted file (Age/SOPS) with local master key, stored in ~/.noosystem/secrets/"
+      enterprise: "External secret manager (Vault, AWS Secrets Manager, etc.) or SPIFFE/SPIRE"
+    audit:
+      description: "Every secret resolution is logged (timestamp, secret name, backend, outcome) without recording the value."
 
   # ── CLI ──
   cli:
@@ -293,6 +346,10 @@ spec:
       always: "LLM consulted before every execution."
       on_error: "LLM consulted only if previous cycle had errors."
       on_change: "LLM consulted when mission, context, or endpoints change."
+      cached: >
+        Agent first searches semantic memory for a matching rule with 
+        sufficient confidence. If found, applies it without LLM. If not, 
+        consults LLM and stores the new response as a semantic rule.
     tool_types:
       mcp_server:
         description: "Tool provided by a Model Context Protocol server."
@@ -330,6 +387,8 @@ spec:
           defaults:
             method: "GET"
             timeout_ms: 5000
+          auth:
+            api_key: ${env:MONITORING_API_KEY}
       llm:
         mode: "on_error"
 
@@ -411,7 +470,7 @@ spec:
       Placeholders use {{ double braces }} syntax.
     level_1:
       00_manifest.yaml: |
-        framework: AOF‑S v1.3
+        framework: AOF‑S v1.4
         level: 1
         name: "{{ agent_name }}"
         project: "{{ project_name }}"
@@ -422,9 +481,22 @@ spec:
           {{ #each active_skills }}
           - "{{ this }}"
           {{ /each }}
+        imports:
+          {{ #each imports }}
+          - path: "{{ this.path }}"
+            include:
+              {{ #each this.include }}
+              - "{{ this }}"
+              {{ /each }}
+            conflict_policy: "{{ this.conflict_policy }}"
+          {{ /each }}
       02_agent_spec.yaml: |
         role: "{{ role }}"
         model: "{{ model }}"
+        vcv:
+          {{ #each vcv }}
+          - "{{ this }}"
+          {{ /each }}
         allowed_tools:
           {{ #each allowed_tools }}
           - "{{ this }}"
@@ -432,6 +504,11 @@ spec:
         constraints:
           max_parallel_actions: {{ max_parallel_actions }}
           timeout_per_request_ms: {{ timeout_per_request_ms }}
+        inference:
+          mode: "local_first"
+          engines:
+            - name: "ollama"
+              models: ["{{ model }}"]
         evaluation:
           metrics:
             - task_success_rate
@@ -517,6 +594,55 @@ spec:
                 endpoint: "{{ a2a_events_endpoint }}"
                 subscription: true
 
+  # ── Artifacts Format ──
+  artifacts_format:
+    description: >
+      Each artifact has a specific format according to its cognitive purpose.
+      The runtime must parse artifacts based on this classification, without
+      using automatic detection heuristics.
+    classification:
+      yaml_pure:
+        description: "Structured data that the runtime parses directly."
+        applies_to:
+          - "00_manifest.yaml"
+          - "02_agent_spec.yaml"
+          - "03_mission.yaml"
+          - "06_knowledge/world_model/variables.yaml"
+          - "06_knowledge/registry.yaml"
+          - "07_memory/semantic/learned_rules.yaml"
+          - "07_memory/procedural/policies.yaml"
+          - "07_memory/meta/meta_strategies.yaml"
+          - "09_observations/feedback.yaml"
+          - "09_observations/feedback_log.yaml"
+          - "10_values/preferences.yaml"
+      markdown_pure:
+        description: "Free text for humans or for the agent as narrative."
+        applies_to:
+          - "01_context_static.md"
+          - "04_tasks/current_plan.md"
+          - "04_tasks/hypothesis.md"
+          - "04_tasks/steps.md"
+          - "04_hypotheses/active/*.md"
+          - "04_hypotheses/validated/*.md"
+          - "04_hypotheses/falsified/*.md"
+          - "06_knowledge/world_model/state.md"
+          - "06_knowledge/tasks/current_steps.md"
+          - "07_memory/semantic/domain_facts.md"
+          - "08_validation_spec.md"
+          - "09_observations/anomalies.md"
+          - "09_observations/anomaly_notes.md"
+          - "10_values/constitution.md"
+      markdown_with_frontmatter:
+        description: >
+          Structured data (YAML frontmatter) plus human-readable instructions
+          (Markdown body). This is the ONLY format that uses frontmatter.
+        applies_to:
+          - "05_skills/*/SKILL.md"
+    notes:
+      - "The runtime must NOT attempt to auto-detect the format."
+      - "current_steps.md is plain Markdown. The N3 delegates an objective, not specific tools."
+      - "hypothesis.md is plain Markdown. The LLM generates semi-structured text parsed with simple patterns."
+      - "preferences.yaml is YAML but may contain flexible key-value pairs."
   # ── Sectors ──
   sectors:
     supported:
