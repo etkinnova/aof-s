@@ -60,8 +60,8 @@ spec:
         Complexity is activated only when needed. Agents scale from N1 
         (3 files) to N3 (30+ files) through declarative upgrades.
 
-  # ── Ecosystem Paths ──
-  ecosystem:
+  # ── Ecosystem Central Directory ──
+  ecosystem_config:
     central_directory:
       description: >
         Central directory for the Noosystem ecosystem, shared by all agents 
@@ -111,6 +111,7 @@ spec:
         - "03_mission.yaml"
         - "04_tasks/hypothesis.md"
         - "04_tasks/steps.md"
+        - "04_tasks/contracts/"
         - "05_skills/"
         - "06_world_model/variables.yaml"
         - "06_world_model/state.md"
@@ -138,6 +139,7 @@ spec:
         - "04_hypotheses/active/"
         - "04_hypotheses/validated/"
         - "04_hypotheses/falsified/"
+        - "04_tasks/contracts/"
         - "05_skills/"
         - "06_knowledge/world_model/variables.yaml"
         - "06_knowledge/world_model/causal_graph.proto"
@@ -233,6 +235,57 @@ spec:
           path: "Path to the package directory"
           include: "List of ranges to import (e.g., ['05_skills', '06_world_model'])"
           conflict_policy: "merge | override | skip (default: merge)"
+
+  # ── Artifacts Format ──
+  artifacts_format:
+    description: >
+      Each artifact has a specific format according to its cognitive purpose.
+      The runtime must parse artifacts based on this classification, without
+      using automatic detection heuristics.
+    classification:
+      yaml_pure:
+        description: "Structured data that the runtime parses directly."
+        applies_to:
+          - "00_manifest.yaml"
+          - "02_agent_spec.yaml"
+          - "03_mission.yaml"
+          - "06_knowledge/world_model/variables.yaml"
+          - "06_knowledge/registry.yaml"
+          - "07_memory/semantic/learned_rules.yaml"
+          - "07_memory/procedural/policies.yaml"
+          - "07_memory/meta/meta_strategies.yaml"
+          - "09_observations/feedback.yaml"
+          - "09_observations/feedback_log.yaml"
+          - "10_values/preferences.yaml"
+      markdown_pure:
+        description: "Free text for humans or for the agent as narrative."
+        applies_to:
+          - "01_context_static.md"
+          - "04_tasks/current_plan.md"
+          - "04_tasks/hypothesis.md"
+          - "04_tasks/steps.md"
+          - "04_hypotheses/active/*.md"
+          - "04_hypotheses/validated/*.md"
+          - "04_hypotheses/falsified/*.md"
+          - "04_tasks/contracts/*.md"
+          - "06_knowledge/world_model/state.md"
+          - "06_knowledge/tasks/current_steps.md"
+          - "07_memory/semantic/domain_facts.md"
+          - "08_validation_spec.md"
+          - "09_observations/anomalies.md"
+          - "09_observations/anomaly_notes.md"
+          - "10_values/constitution.md"
+      markdown_with_frontmatter:
+        description: >
+          Structured data (YAML frontmatter) plus human-readable instructions
+          (Markdown body). This is the ONLY format that uses frontmatter.
+        applies_to:
+          - "05_skills/*/SKILL.md"
+    notes:
+      - "The runtime must NOT attempt to auto-detect the format."
+      - "current_steps.md is plain Markdown. The N3 delegates an objective, not specific tools."
+      - "hypothesis.md is plain Markdown. The LLM generates semi-structured text parsed with simple patterns."
+      - "preferences.yaml is YAML but may contain flexible key-value pairs."
 
   # ── Deployment Profiles ──
   deployment_profiles:
@@ -404,6 +457,10 @@ spec:
         description: "Per-agent OPA policy overrides (if different from global Noosfile policies)."
       communication:
         description: "Agent-level A2A communication settings (channels, timeouts, retries)."
+      offered_capabilities:
+        description: "List of capabilities this agent offers to peers for direct collaboration."
+      team_participation:
+        description: "Whether this agent accepts participation in dynamically formed teams."
 
   # ── 11_ASA.yaml ──
   identity_communication:
@@ -423,6 +480,11 @@ spec:
           - type: "event_stream"
             endpoint: "/a2a/events"
             subscription: true
+      federation:
+        description: "Optional federation settings for N3s coordinating across namespaces."
+        fields:
+          role: "parent | child | peer"
+          federated_n3s: "List of federated N3 endpoints"
 
   # ── Security ──
   security:
@@ -468,84 +530,100 @@ spec:
       Content templates for each artifact. The N3 uses these to generate 
       agent configurations from structured plans (JSON output of the LLM).
       Placeholders use {{ double braces }} syntax.
+      context_defaults are inherited from parent levels via 'extends'.
+      Values in the plan JSON override context_defaults.
     level_1:
-      00_manifest.yaml: |
-        framework: AOF‑S v1.4
-        level: 1
-        name: "{{ agent_name }}"
-        project: "{{ project_name }}"
-        created: "{{ creation_date }}"
-        agent_instance: "{{ instance_id }}"
-        profile: "{{ profile }}"
-        active_skills:
-          {{ #each active_skills }}
-          - "{{ this }}"
-          {{ /each }}
-        imports:
-          {{ #each imports }}
-          - path: "{{ this.path }}"
-            include:
-              {{ #each this.include }}
-              - "{{ this }}"
-              {{ /each }}
-            conflict_policy: "{{ this.conflict_policy }}"
-          {{ /each }}
-      02_agent_spec.yaml: |
-        role: "{{ role }}"
-        model: "{{ model }}"
-        vcv:
-          {{ #each vcv }}
-          - "{{ this }}"
-          {{ /each }}
-        allowed_tools:
-          {{ #each allowed_tools }}
-          - "{{ this }}"
-          {{ /each }}
-        constraints:
-          max_parallel_actions: {{ max_parallel_actions }}
-          timeout_per_request_ms: {{ timeout_per_request_ms }}
-        inference:
-          mode: "local_first"
-          engines:
-            - name: "ollama"
-              models: ["{{ model }}"]
-        evaluation:
-          metrics:
-            - task_success_rate
-      03_mission.yaml: |
-        mission:
-          description: "{{ mission_description }}"
-          success_criteria:
-            {{ #each success_criteria }}
+      context_defaults:
+        inference_endpoint: "http://localhost:11434/api/generate"
+        inference_model: "llama3.2:latest"
+        notes: ""
+        constraints: []
+        profile: "standalone"
+        team_participation: false
+      artifacts:
+        00_manifest.yaml: |
+          framework: AOF‑S v1.4
+          level: 1
+          name: "{{ agent_name }}"
+          project: "{{ project_name }}"
+          created: "{{ creation_date }}"
+          agent_instance: "{{ instance_id }}"
+          profile: "{{ profile }}"
+          active_skills:
+            {{ #each active_skills }}
             - "{{ this }}"
             {{ /each }}
-      05_skills/{{ skill_name }}/SKILL.md: |
-        ---
-        name: {{ skill_name }}
-        description: "{{ skill_description }}"
-        version: "1.0.0"
-        tools:
-          {{ #each tools }}
-          - name: "{{ this.name }}"
-            {{ #if this.mcp_server }}
-            mcp_server:
-              name: "{{ this.mcp_server }}"
-            {{ /if }}
-            {{ #if this.native }}
-            native:
-              action: "{{ this.native }}"
-            {{ /if }}
-            function:
-              parameters: {{ this.parameters_json }}
-            defaults: {{ this.defaults_json }}
-          {{ /each }}
-        llm:
-          mode: "{{ llm_mode }}"
-        ---
-        # Skill: {{ skill_name }}
-        {{ skill_body }}
+          imports:
+            {{ #each imports }}
+            - path: "{{ this.path }}"
+              include:
+                {{ #each this.include }}
+                - "{{ this }}"
+                {{ /each }}
+              conflict_policy: "{{ this.conflict_policy }}"
+            {{ /each }}
+        02_agent_spec.yaml: |
+          role: "{{ role }}"
+          vcv:
+            {{ #each vcv }}
+            - "{{ this }}"
+            {{ /each }}
+          allowed_tools:
+            {{ #each allowed_tools }}
+            - "{{ this }}"
+            {{ /each }}
+          offered_capabilities:
+            {{ #each offered_capabilities }}
+            - "{{ this }}"
+            {{ /each }}
+          team_participation: {{ team_participation }}
+          constraints:
+            max_parallel_actions: {{ max_parallel_actions }}
+            timeout_per_request_ms: {{ timeout_per_request_ms }}
+          inference:
+            mode: "local_first"
+            endpoint: "{{ inference_endpoint }}"
+            model: "{{ inference_model }}"
+          evaluation:
+            metrics:
+              - task_success_rate
+        03_mission.yaml: |
+          mission: "{{ mission_description }}"
+          constraints:
+            {{ #each constraints }}
+            - "{{ this }}"
+            {{ /each }}
+          notes: "{{ notes }}"
+        05_skills/{{ skill_name }}/SKILL.md: |
+          ---
+          name: {{ skill_name }}
+          description: "{{ skill_description }}"
+          version: "1.0.0"
+          tools:
+            {{ #each tools }}
+            - name: "{{ this.name }}"
+              {{ #if this.mcp_server }}
+              mcp_server:
+                name: "{{ this.mcp_server }}"
+              {{ /if }}
+              {{ #if this.native }}
+              native:
+                action: "{{ this.native }}"
+              {{ /if }}
+              function:
+                parameters: {{ this.parameters_json }}
+              defaults: {{ this.defaults_json }}
+            {{ /each }}
+          llm:
+            mode: "{{ llm_mode }}"
+          ---
+          # Skill: {{ skill_name }}
+          {{ skill_body }}
     level_2:
       extends: "level_1"
+      context_defaults:
+        variables: []
+        constitution_body: "# Constitution\n\nDefault constitution for this agent."
       additional_artifacts:
         06_world_model/variables.yaml: |
           variables:
@@ -559,6 +637,15 @@ spec:
           {{ constitution_body }}
     level_3:
       extends: "level_2"
+      context_defaults:
+        agents: []
+        trust_domain: "noos.local"
+        a2a_endpoint: "/a2a/execute"
+        a2a_timeout: 30
+        a2a_retries: 3
+        a2a_events_endpoint: "/a2a/events"
+        federation_role: "peer"
+        federated_n3s: []
       additional_artifacts:
         06_knowledge/registry.yaml: |
           agents:
@@ -593,56 +680,13 @@ spec:
               - type: "event_stream"
                 endpoint: "{{ a2a_events_endpoint }}"
                 subscription: true
+          federation:
+            role: "{{ federation_role }}"
+            federated_n3s:
+              {{ #each federated_n3s }}
+              - "{{ this }}"
+              {{ /each }}
 
-  # ── Artifacts Format ──
-  artifacts_format:
-    description: >
-      Each artifact has a specific format according to its cognitive purpose.
-      The runtime must parse artifacts based on this classification, without
-      using automatic detection heuristics.
-    classification:
-      yaml_pure:
-        description: "Structured data that the runtime parses directly."
-        applies_to:
-          - "00_manifest.yaml"
-          - "02_agent_spec.yaml"
-          - "03_mission.yaml"
-          - "06_knowledge/world_model/variables.yaml"
-          - "06_knowledge/registry.yaml"
-          - "07_memory/semantic/learned_rules.yaml"
-          - "07_memory/procedural/policies.yaml"
-          - "07_memory/meta/meta_strategies.yaml"
-          - "09_observations/feedback.yaml"
-          - "09_observations/feedback_log.yaml"
-          - "10_values/preferences.yaml"
-      markdown_pure:
-        description: "Free text for humans or for the agent as narrative."
-        applies_to:
-          - "01_context_static.md"
-          - "04_tasks/current_plan.md"
-          - "04_tasks/hypothesis.md"
-          - "04_tasks/steps.md"
-          - "04_hypotheses/active/*.md"
-          - "04_hypotheses/validated/*.md"
-          - "04_hypotheses/falsified/*.md"
-          - "06_knowledge/world_model/state.md"
-          - "06_knowledge/tasks/current_steps.md"
-          - "07_memory/semantic/domain_facts.md"
-          - "08_validation_spec.md"
-          - "09_observations/anomalies.md"
-          - "09_observations/anomaly_notes.md"
-          - "10_values/constitution.md"
-      markdown_with_frontmatter:
-        description: >
-          Structured data (YAML frontmatter) plus human-readable instructions
-          (Markdown body). This is the ONLY format that uses frontmatter.
-        applies_to:
-          - "05_skills/*/SKILL.md"
-    notes:
-      - "The runtime must NOT attempt to auto-detect the format."
-      - "current_steps.md is plain Markdown. The N3 delegates an objective, not specific tools."
-      - "hypothesis.md is plain Markdown. The LLM generates semi-structured text parsed with simple patterns."
-      - "preferences.yaml is YAML but may contain flexible key-value pairs."
   # ── Sectors ──
   sectors:
     supported:
