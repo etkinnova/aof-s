@@ -1,0 +1,26 @@
+# 02_agent_spec.yaml — Especificación del N3 (AOF‑S v1.4)
+role: "Orquestador de Infraestructura Cloud"
+mode: "complete"   # complete | degraded | delegating
+model: "llama3.2:latest" 
+vcv:
+  - "orchestration:v1"
+  - "deployment:v2"
+allowed_tools:
+  - deploy_agent          # Despliega nuevos agentes ASA
+constraints:
+  max_parallel_actions: 3
+  timeout_per_request_ms: 200000
+inference:
+  mode: "local_first"
+  endpoint: "http://localhost:11434/api/generate"
+  model: "llama3.2:latest"
+  fallback_to_cloud: false
+evaluation:
+  metrics:
+    - deployment_success_rate
+    - delegation_success_rate
+    - hypothesis_precision
+security_overrides:
+  policies: |
+    package noos.authz
+    allow { input.action in ["deploy_agent", "delegate_task", "read_file", "write_to_file"] }

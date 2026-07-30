@@ -2,8 +2,8 @@ apiVersion: aof-s/v1
 kind: Standard
 metadata:
   name: AI Orchestration Files for Systemic Agents
-  version: "1.4"
-  compatible_versions: ["1.2", "1.3"]
+  version: "1.5"
+  compatible_versions: ["1.2", "1.3", "1.4"]
   description: >
     Open standard for versionable AI orchestration files that materialize 
     the cognitive artifacts of the ASA (Adaptive Systemic Agent) architecture.
@@ -11,7 +11,7 @@ metadata:
     Local-First ecosystem. This specification defines only the file format 
     and conventions; runtimes (such as ASA Agent) interpret the artifacts.
 spec:
-  implements: "ASA v1.4"
+  implements: "ASA v1.5"
   ecosystem: "Noosystem"
 
   # ── Principles (8 principles, 0-7) ──
@@ -26,7 +26,8 @@ spec:
       name: Cognitive Separation
       description: >
         Each artifact answers a precise cognitive question: identity, mission, 
-        context, world model, memory, observations, or values.
+        context, world model, memory, observations, or values. Each range 
+        groups artifacts that answer the same fundamental question.
     - id: 2
       name: Progressive Context Loading
       description: >
@@ -58,7 +59,9 @@ spec:
       name: Progressive Agency
       description: >
         Complexity is activated only when needed. Agents scale from N1 
-        (3 files) to N3 (30+ files) through declarative upgrades.
+        (3 files) to N3 (30+ files) through declarative upgrades. Artifacts 
+        with the same cognitive purpose reside in the same path across all 
+        levels to facilitate progression without migration.
 
   # ── Ecosystem Central Directory ──
   ecosystem_config:
@@ -91,7 +94,7 @@ spec:
         - "04_tasks/current_plan.md"
         - "05_skills/"
         - "08_validation_spec.md"
-        - "09_observations.log"
+        - "09_observations/feedback.yaml"
       modes:
         ultra_light:
           artifacts: ["00_manifest.yaml", "01_context_static.md", "02_agent_spec.yaml"]
@@ -109,9 +112,9 @@ spec:
         - "01_context_static.md"
         - "02_agent_spec.yaml"
         - "03_mission.yaml"
-        - "04_tasks/hypothesis.md"
-        - "04_tasks/steps.md"
-        - "04_tasks/contracts/"
+        - "04_hypotheses/active.md"
+        - "04_tasks/current_plan.md"
+        - "04_tasks/executed/"
         - "05_skills/"
         - "06_world_model/variables.yaml"
         - "06_world_model/state.md"
@@ -130,7 +133,7 @@ spec:
         - "00_manifest.yaml"
         - "02_agent_spec.yaml"
         - "07_memory/"
-        - "06_knowledge/registry.yaml"
+        - "10_values/registry.yaml"
       artifacts:
         - "00_manifest.yaml"
         - "01_context_static.md"
@@ -139,26 +142,27 @@ spec:
         - "04_hypotheses/active/"
         - "04_hypotheses/validated/"
         - "04_hypotheses/falsified/"
-        - "04_tasks/contracts/"
+        - "04_tasks/current_plan.md"
+        - "04_tasks/executed/"
+        - "04_tasks/delegated/current_steps.md"
         - "05_skills/"
-        - "06_knowledge/world_model/variables.yaml"
-        - "06_knowledge/world_model/causal_graph.proto"
-        - "06_knowledge/world_model/delays.yaml"
-        - "06_knowledge/world_model/state.md"
-        - "06_knowledge/expert_corpus/vector_store/"
-        - "06_knowledge/expert_corpus/source_documents/"
-        - "06_knowledge/expert_corpus/sectors/"
-        - "06_knowledge/registry.yaml"
-        - "06_knowledge/tasks/current_steps.md"
+        - "06_world_model/variables.yaml"
+        - "06_world_model/state.md"
+        - "06_world_model/causal_graph.proto"
+        - "06_world_model/delays.yaml"
+        - "06_world_model/expert_corpus/vector_store/"
+        - "06_world_model/expert_corpus/source_documents/"
+        - "06_world_model/expert_corpus/sectors/"
         - "07_memory/episodic/"
         - "07_memory/semantic/learned_rules.yaml"
         - "07_memory/semantic/domain_facts.md"
         - "07_memory/procedural/policies.yaml"
         - "08_validation_spec.md"
-        - "09_observations/feedback_log.yaml"
-        - "09_observations/anomaly_notes.md"
+        - "09_observations/feedback.yaml"
+        - "09_observations/anomalies.md"
         - "10_values/constitution.md"
-        - "10_values/user_preferences.yaml"
+        - "10_values/preferences.yaml"
+        - "10_values/registry.yaml"
         - "11_ASA.yaml"
       modes:
         complete:
@@ -201,6 +205,8 @@ spec:
     description: >
       If total_errors == 0 after evaluation, the agent skips hypothesis and 
       reflection phases, reducing token consumption in normal operation.
+      Defined in asa.yaml; the runtime implements this mechanism for N2/N3.
+      Artifact authors should not assume that these phases always execute.
     implemented_in: "ASA Agent runtime (N2/N3)"
     scope: [N2, N3]
 
@@ -225,11 +231,18 @@ spec:
         description: "Optional free-form key-value pairs for project/instance identification."
         type: "map"
       profile:
-        description: "Deployment profile this agent instance runs on."
+        description: >
+          Deployment profile for this agent instance. Determines the secrets 
+          backend and network dependencies. standalone uses .env; edge uses 
+          encrypted files with local master key; enterprise uses external 
+          secret managers (Vault, AWS Secrets Manager) or SPIFFE/SPIRE.
         type: "string"
         enum: ["standalone", "edge", "enterprise"]
+        default: "standalone"
       imports:
-        description: "Optional list of AOF Packages to incorporate into this agent."
+        description: >
+          Optional list of AOF Packages to incorporate into this agent.
+          Paths are relative to the agent directory or absolute.
         type: "list"
         items:
           path: "Path to the package directory"
@@ -249,31 +262,28 @@ spec:
           - "00_manifest.yaml"
           - "02_agent_spec.yaml"
           - "03_mission.yaml"
-          - "06_knowledge/world_model/variables.yaml"
-          - "06_knowledge/registry.yaml"
+          - "06_world_model/variables.yaml"
           - "07_memory/semantic/learned_rules.yaml"
           - "07_memory/procedural/policies.yaml"
           - "07_memory/meta/meta_strategies.yaml"
           - "09_observations/feedback.yaml"
-          - "09_observations/feedback_log.yaml"
           - "10_values/preferences.yaml"
+          - "10_values/registry.yaml"
       markdown_pure:
         description: "Free text for humans or for the agent as narrative."
         applies_to:
           - "01_context_static.md"
           - "04_tasks/current_plan.md"
-          - "04_tasks/hypothesis.md"
-          - "04_tasks/steps.md"
+          - "04_hypotheses/active.md"
           - "04_hypotheses/active/*.md"
           - "04_hypotheses/validated/*.md"
           - "04_hypotheses/falsified/*.md"
-          - "04_tasks/contracts/*.md"
-          - "06_knowledge/world_model/state.md"
-          - "06_knowledge/tasks/current_steps.md"
+          - "04_tasks/executed/*.md"
+          - "04_tasks/delegated/current_steps.md"
+          - "06_world_model/state.md"
           - "07_memory/semantic/domain_facts.md"
           - "08_validation_spec.md"
           - "09_observations/anomalies.md"
-          - "09_observations/anomaly_notes.md"
           - "10_values/constitution.md"
       markdown_with_frontmatter:
         description: >
@@ -284,18 +294,22 @@ spec:
     notes:
       - "The runtime must NOT attempt to auto-detect the format."
       - "current_steps.md is plain Markdown. The N3 delegates an objective, not specific tools."
-      - "hypothesis.md is plain Markdown. The LLM generates semi-structured text parsed with simple patterns."
       - "preferences.yaml is YAML but may contain flexible key-value pairs."
+      - "feedback.yaml is YAML for all levels (N1, N2, N3)."
+      - "N2 hypothesis moved to 04_hypotheses/active.md for semantic clarity and N3 progression."
+      - "registry.yaml moved to 10_values/ (governance). delegated tasks moved to 04_tasks/delegated/ (tasks)."
+      - "06_knowledge/ has been dissolved; its artifacts are now in 04_tasks/, 06_world_model/, and 10_values/."
 
   # ── Deployment Profiles ──
   deployment_profiles:
     standalone:
       description: "Single agent on a local device. No network dependencies."
-      required_components: [".aof/", "binario N1/N2"]
+      required_components: [".aof/", "binary N1/N2"]
       latency_target: "<100ms"
       privacy: "maximum"
       scalability: "1 agent"
       offline_resilience: "total"
+      secrets_backend: "Environment variables or .env file"
     edge:
       description: "Multiple agents on local network with lightweight messaging."
       required_components: [".aof/", "NATS", "LanceDB/SQLite (optional)"]
@@ -303,6 +317,7 @@ spec:
       privacy: "high"
       scalability: "10-50 agents"
       offline_resilience: "high"
+      secrets_backend: "Encrypted file (Age/SOPS) with local master key"
     enterprise:
       description: "Full ecosystem with Kubernetes, service mesh, and Zero Trust security."
       required_components: [".aof/", "Kubernetes", "Istio", "SPIRE", "OPA", "Kafka"]
@@ -310,6 +325,7 @@ spec:
       privacy: "medium (depends on architecture)"
       scalability: "100s of agents"
       offline_resilience: "low (cloud-dependent)"
+      secrets_backend: "External secret manager (Vault, AWS Secrets Manager, etc.) or SPIFFE/SPIRE"
 
   # ── Secrets Management ──
   secrets:
@@ -336,6 +352,7 @@ spec:
       - init
       - apply
       - upgrade
+      - migrate
       - status
       - get
       - describe
@@ -365,12 +382,12 @@ spec:
       vcv:
         description: "Versioned Capability Vectors enable semantic agent discovery."
         format: "capability:v1, capability:v2"
-        stored_in: "registry.yaml"
+        stored_in: "10_values/registry.yaml"
 
   # ── Registry ──
   registry:
-    description: "Agent registry maintained by the N3 orchestrator."
-    file: "06_knowledge/registry.yaml"
+    description: "Agent registry maintained by the N3 orchestrator. Moved to 10_values/ for governance alignment."
+    file: "10_values/registry.yaml"
     fields:
       - name
       - level
@@ -389,6 +406,14 @@ spec:
       Each skill is a subdirectory inside 05_skills/ containing a SKILL.md 
       file with YAML frontmatter and Markdown instructions. Optional 
       subdirectories: scripts/, references/, assets/.
+      The fields 'tools' and 'llm' are optional extensions of AOF‑S. If they 
+      are not present, the runtime MUST use the Markdown body as the source 
+      of instructions for the LLM, ensuring full compatibility with the 
+      Agent Skills standard.
+      The field 'allowed-tools' restricts which tools this specific skill can 
+      invoke. It works in conjunction with 'allowed_tools' in 02_agent_spec.yaml 
+      (which restricts at the agent level). The runtime applies both 
+      restrictions (intersection).
     structure:
       SKILL.md: "YAML frontmatter + Markdown body (mandatory)"
       scripts/: "executable code (optional)"
@@ -423,7 +448,7 @@ spec:
         fields:
           parameters: "JSON Schema for the tool's input"
     example:
-      name: "health_check"
+      name: "health-check"
       version: "1.0.0"
       tools:
         - name: "http_health"
@@ -450,7 +475,15 @@ spec:
     description: "Additional fields allowed in 02_agent_spec.yaml beyond role and VCVs."
     optional_fields:
       allowed_tools:
-        description: "List of tool names this agent is permitted to use."
+        description: "List of tool names this agent is permitted to use (agent-level whitelist)."
+      mode:
+        description: >
+          Operation mode for this agent instance. Only applicable to N3.
+          Defines the maximum authorized mode; the runtime may degrade to 
+          lighter modes automatically but must never exceed this setting.
+        type: "string"
+        enum: ["complete", "degraded", "delegating"]
+        default: "complete"
       constraints:
         description: "Operational limits (max_parallel_actions, timeout_per_request_ms, etc.)."
       security_overrides:
@@ -532,6 +565,25 @@ spec:
       Placeholders use {{ double braces }} syntax.
       context_defaults are inherited from parent levels via 'extends'.
       Values in the plan JSON override context_defaults.
+    runtime_placeholders:
+      description: "Placeholders generated by the runtime, not from the plan or context_defaults."
+      placeholders:
+        - name: creation_date
+          source: "runtime (chrono::Utc::now())"
+          type: string
+          example: "2026-07-26"
+        - name: instance_id
+          source: "runtime (timestamp)"
+          type: string
+          example: "agent-1234567890"
+        - name: skill_body
+          source: "skill body (Markdown)"
+          type: string
+          example: "# Instructions\n..."
+        - name: inference_info
+          source: "context_defaults (configurable)"
+          type: string
+          example: "Inferencia local vía Ollama"
     level_1:
       context_defaults:
         inference_endpoint: "http://localhost:11434/api/generate"
@@ -540,9 +592,10 @@ spec:
         constraints: []
         profile: "standalone"
         team_participation: false
+        inference_info: "Inferencia local vía Ollama"
       artifacts:
         00_manifest.yaml: |
-          framework: AOF‑S v1.4
+          framework: AOF‑S v1.5
           level: 1
           name: "{{ agent_name }}"
           project: "{{ project_name }}"
@@ -562,6 +615,19 @@ spec:
                 {{ /each }}
               conflict_policy: "{{ this.conflict_policy }}"
             {{ /each }}
+        01_context_static.md: |
+          # Contexto estático para {{ agent_name }}
+
+          ## Stack
+          - Lenguaje: Rust
+          - Runtime: Tokio
+          - {{ inference_info }}
+
+          ## Misión
+          {{ mission_description }}
+
+          ## Creación
+          Generado automáticamente el {{ creation_date }}.
         02_agent_spec.yaml: |
           role: "{{ role }}"
           vcv:
@@ -594,6 +660,9 @@ spec:
             - "{{ this }}"
             {{ /each }}
           notes: "{{ notes }}"
+        04_tasks/current_plan.md: |
+          # Plan actual
+          {{ mission_description }}
         05_skills/{{ skill_name }}/SKILL.md: |
           ---
           name: {{ skill_name }}
@@ -602,23 +671,28 @@ spec:
           tools:
             {{ #each tools }}
             - name: "{{ this.name }}"
-              {{ #if this.mcp_server }}
+              description: "{{ this.description }}"
               mcp_server:
                 name: "{{ this.mcp_server }}"
-              {{ /if }}
-              {{ #if this.native }}
               native:
                 action: "{{ this.native }}"
-              {{ /if }}
               function:
-                parameters: {{ this.parameters_json }}
-              defaults: {{ this.defaults_json }}
+                parameters: {{ this.function.parameters }}
+              defaults: {{ this.defaults }}
             {{ /each }}
           llm:
             mode: "{{ llm_mode }}"
           ---
           # Skill: {{ skill_name }}
           {{ skill_body }}
+        08_validation_spec.md: |
+          # Reglas de validación AOF‑S v1.5
+          - Nivel: {{ level }}
+          - Validar contra la especificación `aof-s.yaml` (sección `levels[{{ level }}]`).
+        09_observations/feedback.yaml: |
+          # Feedback del agente {{ agent_name }}
+          # Inicializado en {{ creation_date }}
+          feedback: []
     level_2:
       extends: "level_1"
       context_defaults:
@@ -632,9 +706,26 @@ spec:
               type: "{{ this.type }}"
               initial_value: {{ this.initial_value }}
             {{ /each }}
+        06_world_model/state.md: |
+          # Estado del sistema
+          # Inicializado en {{ creation_date }}
+          # El runtime actualizará este archivo durante la operación.
+        04_hypotheses/active.md: |
+          # Hipótesis activa
+          # Inicializado en {{ creation_date }}
+        04_tasks/executed/.gitkeep: |
+          # Archivos de tareas delegadas ejecutadas
+        09_observations/anomalies.md: |
+          # Anomalías detectadas
+          # Inicializado en {{ creation_date }}
+          # El runtime actualizará este archivo durante la operación.
         10_values/constitution.md: |
           # Constitution
           {{ constitution_body }}
+        10_values/preferences.yaml: |
+          # Preferencias del usuario para {{ agent_name }}
+          # Inicializado en {{ creation_date }}
+          preferences: {}
     level_3:
       extends: "level_2"
       context_defaults:
@@ -647,7 +738,7 @@ spec:
         federation_role: "peer"
         federated_n3s: []
       additional_artifacts:
-        06_knowledge/registry.yaml: |
+        10_values/registry.yaml: |
           agents:
             {{ #each agents }}
             - name: "{{ this.name }}"
@@ -666,6 +757,9 @@ spec:
                 {{ /each }}
               heartbeat_interval: {{ this.heartbeat_interval }}
             {{ /each }}
+        04_tasks/delegated/current_steps.md: |
+          # Tarea delegada actual
+          # Inicializado en {{ creation_date }}
         11_ASA.yaml: |
           identity:
             spiffe_id: "{{ spiffe_id }}"

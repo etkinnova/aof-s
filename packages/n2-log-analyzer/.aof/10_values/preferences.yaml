@@ -1,0 +1,5 @@
+# 10_values/user_preferences.yaml — Placeholder
+# Preferencias del usuario para log-analyzer
+preferences:
+  log_path: "./app.log"
+  error_threshold: 3

@@ -1,0 +1,15 @@
+✅ Agentes generados: error-monitor (1 agentes)
+## Modo de operación: complete
+## Ejecución — 2026-07-28 06:25:14
+
+- ERROR interno: Error de configuración: Falta 'ecosystem_plan' o 'plan' en defaults para deploy_agent
+
+## Modo de operación: degraded
+## Ejecución — 2026-07-28 06:30:34
+
+- ERROR interno: Error de configuración: Artefacto 'values/registry' no definido para nivel 1
+
+## Modo de operación: degraded
+## Ejecución — 2026-07-28 06:53:01
+
+✅ Agentes generados: error-monitor (1 agentes)

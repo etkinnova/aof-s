@@ -1,0 +1,6 @@
+# 03_mission.yaml — Misión del Orquestador ASA (N2)
+# AOF‑S v1.4 / ASA v1.4
+mission: "Analizar el archivo app.log, contar errores y formular hipótesis sobre su tendencia."
+constraints:
+  - "El umbral de errores para alerta es 3."
+notes: "Este agente demuestra aprendizaje local."

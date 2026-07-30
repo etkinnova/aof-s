@@ -1,0 +1,9 @@
+sector: "test"
+last_updated: "2026-07-26T00:00:00Z"
+variables:
+  - name: "error_count"
+    description: "Número de errores en el log"
+    value: 0
+    unit: "count"
+    source: "app.log"
+    refresh_interval: "1m"

@@ -1,0 +1,6 @@
+2026-07-26T10:00:00Z INFO  Servicio iniciado
+2026-07-26T10:01:00Z ERROR Error de conexión a la base de datos
+2026-07-26T10:02:00Z WARN  Timeout en la API
+2026-07-26T10:03:00Z ERROR Fallo en el procesamiento de datos
+2026-07-26T10:04:00Z ERROR Timeout en la API (2)
+2026-07-26T10:05:00Z INFO  Servicio finalizado

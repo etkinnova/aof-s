@@ -1,0 +1,10 @@
+# 00_manifest.yaml — Manifiesto del N2 Orquestador (AOF‑S v1.4)
+framework: AOF‑S v1.4
+level: 2
+name: "log-analyzer"
+project: "test"
+created: "2026-07-26"
+agent_instance: "log-001"
+profile: "standalone"
+active_skills:
+  - log-analyzer

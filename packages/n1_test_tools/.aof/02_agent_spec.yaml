@@ -1,0 +1,24 @@
+# 02_agent_spec.yaml
+role: "Tester de herramientas"
+# ── Selecciona la herramienta para ejecutar (solo una a la vez) ──
+# Descomenta la línea correspondiente a la prueba que quieras realizar.
+allowed_tools:
+  # Prueba 1: system_command (health check)
+  - test-tool
+  # Prueba 2: MCP placeholder
+  - test-tool-mcp
+  # Prueba 3: Function placeholder
+  - test-tool-function
+  # Prueba 4: body (sin herramientas) → dejar allowed_tools vacío Para la prueba 4 (body), además debes activar test-skill-body en 00_manifest.yaml
+  # []
+constraints:
+  max_parallel_actions: 1
+  timeout_per_request_ms: 20000
+inference:
+  mode: "local_first"
+  endpoint: "http://localhost:11434/api/generate"
+  model: "llama3.2:latest"
+  fallback_to_cloud: false
+evaluation:
+  metrics:
+    - task_success_rate

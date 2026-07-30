@@ -1,0 +1,13 @@
+# 00_manifest.yaml
+framework: AOF‑S v1.4
+level: 1
+name: "test-agent"
+project: "test"
+created: "2026-07-26"
+agent_instance: "test-001"
+active_skills:
+# ── Selecciona la skill para la prueba ──
+# Para herramientas (system_command, MCP, Function):
+- test-skill-tools
+# Para skill sin herramientas (body):
+# - test-skill-body

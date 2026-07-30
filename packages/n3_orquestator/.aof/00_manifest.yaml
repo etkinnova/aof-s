@@ -1,0 +1,11 @@
+# 00_manifest.yaml — Manifiesto del N3 Orquestador (AOF‑S v1.4)
+framework: AOF‑S v1.4
+level: 3                               # Nivel Orquestado (N3)
+name: "orquestador-cloud"
+project: "infra-demo"
+created: "2026-07-01"
+agent_instance: "orc-001"
+profile: "standalone"                  # Perfil de despliegue (standalone, edge, enterprise)
+active_skills:
+  - deploy-agent-skill                 # Skill principal para desplegar agentes
+  # - monitor-error-skill              # (opcional) Otras skills pueden añadirse aquí

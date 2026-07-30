@@ -1,0 +1,7 @@
+- timestamp: 2026-07-28T06:06:34Z
+  hypothesis_id: H000
+  hypothesis_summary: Sin errores — Puerta de Evidencia activada
+  result: no_data
+  metrics:
+    errors_detected: 0.0
+  notes: No se formularon hipótesis porque no se detectaron errores.

@@ -1,0 +1,18 @@
+# 02_agent_spec.yaml — Especificación del N2 (AOF‑S v1.4)
+role: "Analizador de logs"
+vcv:
+  - "log_analysis:v1"
+allowed_tools:
+  - count_errors
+constraints:
+  max_parallel_actions: 1
+  timeout_per_request_ms: 30000
+inference:
+  mode: "local_first"
+  endpoint: "http://localhost:11434/api/generate"
+  model: "llama3.2:latest"
+  fallback_to_cloud: false
+evaluation:
+  metrics:
+    - task_success_rate
+    - hypothesis_precision

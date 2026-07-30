@@ -1,0 +1,9 @@
+rules:
+- rule: 'Los patrones de error son principalmente relacionados con la falta de información en los datos de solicitud y la necesidad de completar campos obligatorios o faltantes para generar un plan de ecosistema real. (predicción: Si la hipótesis es correcta, espero ver una disminución en los errores relacionados con la falta de información y la necesidad de completar campos obligatorios o faltantes, y un aumento en la cantidad de agentes generados con éxito.)'
+  confidence: 0.6
+  last_accessed: 2026-07-28T06:25:14Z
+  access_count: 1
+  decay_rate: 0.05
+  source: auto
+  tags:
+  - error_500
