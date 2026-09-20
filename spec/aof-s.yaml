@@ -39,9 +39,11 @@ spec:
       name: Reflexive Causal Intervention
       description: >
         Every action requires a registered hypothesis with predicted effects
-        of 1st, 2nd, and 3rd order. Hypothesis is a first-order cognitive act
-        and has its own cognitive range, 05_hypotheses/, not an appendix of
-        planning.
+        of 1st, 2nd, and 3rd order. The hypothesis is formulated before the
+        action (pre-action) in N2 and N3, and has its own cognitive range,
+        05_hypotheses/, not an appendix of planning. The contrast between
+        hypothesis and outcome is performed against verifiable evidence and
+        occurs as a sub-phase of reflect.
     - id: 4
       name: Purposeful Cognitive Memory
       description: >
@@ -248,17 +250,72 @@ spec:
         artifacts: [feedback_log, anomaly_notes]
         tokens_approx: "+1k"
       - phase: reflect
-        artifacts: [hypothesis, semantic_rules, policies, meta_cognitive (N3)]
-        tokens_approx: "+2-3k"
+        sub_phases:
+          - name: contrast
+            artifacts: [hypothesis, feedback_log]
+            tokens_approx: "+1k (always executed)"
+          - name: explain
+            artifacts: [semantic_rules, policies, meta_cognitive (N3)]
+            tokens_approx: "+1-2k (omitted when total_errors == 0)"
+          - name: update
+            artifacts: [semantic_rules, policies]
+            tokens_approx: "variable (omitted when total_errors == 0)"
 
   # ── Evidence Gate ──
   evidence_gate:
     description: >
-      If total_errors == 0 after evaluation, the agent skips hypothesis and
-      reflection phases, reducing token consumption in normal operation.
-      total_errors includes operational errors, task failures, and mission
-      failure. The logic is implemented by the reference runtime conforming
-      to asa.yaml; only parameters are externalized, not control flow.
+      Separates hypothesis registration from reflective learning. When
+      total_errors == 0 after evaluation, the agent omits only the learning
+      sub-phases of reflect (explain and update). Hypothesis registration and
+      the contrast sub-phase always execute, preserving falsifiability and the
+      Reflexive Causal Intervention principle. total_errors includes
+      operational errors, task failures, and mission failure. The logic is
+      implemented by the reference runtime conforming to asa.yaml; only
+      parameters are externalized, not control flow.
+    applies_to: [2, 3]
+    hypothesis_registration:
+      description: >
+        Hypothesize is always executed for N2 and N3. The prediction is
+        generated deterministically from the world model unless the agent
+        specification declares a prompt_template, in which case the LLM is
+        used.
+      always_executed: true
+    reflect_contrast:
+      description: >
+        The contrast sub-phase of reflect is always executed. It compares the
+        registered hypothesis with verifiable evidence and increments or
+        decrements the confidence of the associated semantic rule.
+      always_executed: true
+    reflect_learning:
+      description: >
+        The explain and update sub-phases of reflect are omitted when
+        total_errors == 0, preserving the original intent of the Evidence Gate.
+      condition: "total_errors == 0"
+      omits: [explain, update]
+    total_errors_definition:
+      formula: "operational_errors + task_failures + mission_failure"
+      operational_errors:
+        description: >
+          Sum of failures from tools, MCP, LLM, validation, anomalies, and
+          ledger during the cycle.
+      task_failures:
+        description: >
+          Number of plan steps that failed to satisfy their success criteria
+          or whose tool returned failure.
+      mission_failure:
+        description: >
+          Binary value: 1 if the mission success criteria was not satisfied
+          or the optional LLM mission check returned failure; 0 otherwise.
+    metrics:
+      - name: hypothesis_registered
+        type: boolean
+      - name: explanation_generated
+        type: boolean
+      - name: explanation_source
+        type: enum
+        values: [deterministic, llm, none]
+      - name: explanation_used_in_update
+        type: boolean
     implemented_in: "ASA Agent runtime (N2/N3)"
     scope: [N2, N3]
 
@@ -766,6 +823,9 @@ spec:
           - enhance_with_llm
           - read_file
           - write_to_file
+          - list_dir
+          - glob
+          - read_json
       function:
         description: "Tool defined using JSON Schema, compatible with OpenAI/Anthropic tool calling."
         fields:
